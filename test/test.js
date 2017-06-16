@@ -284,3 +284,13 @@ exports.test_one_is_not_one = function(test) {
 
 	test.done();
 };
+
+
+exports.test_signature2 = function(test) {
+	let email = get_email("email_signature2");
+
+    let fragments = email.getFragments();
+console.log(fragments);
+
+	test.done();
+};
