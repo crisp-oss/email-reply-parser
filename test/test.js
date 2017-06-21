@@ -285,12 +285,22 @@ exports.test_one_is_not_one = function(test) {
 	test.done();
 };
 
-exports.test_test_from = function(test) {
+exports.test_sent_from = function(test) {
 	let email = get_email("email_sent_from");
 
     let fragments = email.getFragments();
 
     test.equal(email.getVisibleText(), "Hi it can happen to any texts you type, as long as you type in between words or paragraphs.\n");
+
+	test.done();
+};
+
+exports.test_email_emoji = function(test) {
+	let email = get_email("email_emoji");
+
+    let fragments = email.getFragments();
+
+    test.equal(email.getVisibleText(), "🎉\n");
 
 	test.done();
 };
