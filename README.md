@@ -8,7 +8,6 @@ willdurand library is based on GitHub's [email_reply_parser](http://github.com/g
 library written in Ruby.
 
 ## Usage
------
 
 ``` javascript
 var EmailReplyParser = require("email-reply-parser");
