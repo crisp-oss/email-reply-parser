@@ -227,6 +227,16 @@ exports.test_email_outlook_en = function(test) {
 	test.done();
 };
 
+exports.test_email_22 = function(test) {
+	let email = get_email("email_22");
+
+    let fragments = email.getFragments();
+
+	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+
+	test.done();
+};
+
 exports.test_email_portuguese = function(test) {
 	let email = get_email("email_portuguese");
 
