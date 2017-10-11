@@ -1,6 +1,6 @@
 # Email Reply Parser
 
-[![Build Status](https://travis-ci.org/crisp-im/email-reply-parser.svg?branch=master)](https://travis-ci.org/crisp-im/email-reply-parser) [![NPM](https://img.shields.io/npm/v/email-reply-parser.svg)](https://www.npmjs.com/package/email-reply-parser
+[![Build Status](https://travis-ci.org/crisp-im/email-reply-parser.svg?branch=master)](https://travis-ci.org/crisp-im/email-reply-parser) [![NPM](https://img.shields.io/npm/v/email-reply-parser.svg)](https://www.npmjs.com/package/email-reply-parser])
 
 **Email Reply Parser is a library to parse plain-text email replies and extract content**
 
@@ -10,7 +10,7 @@ This library suppots most email replies, signatures and locales.
 
 <table>
 <tr>
-<td align="center"><a href="https://crisp.chat/"><img src="https://valeriansaliou.github.io/bloom/images/crisp.png" height="64" /></a></td>
+<td align="center"><a href="https://crisp.chat/"><img src="https://crisp.chat/favicon-256x256.png" height="64" /></a></td>
 </tr>
 <tr>
 <td align="center">Crisp</td>
@@ -45,8 +45,9 @@ Feel free to fork this project and submit fixes. We may adapt your code to fit t
 
 You can run unit tests using:
 
-`npm test`
-
+``` javascript
+npm test
+```
 
 ## Credits
 
