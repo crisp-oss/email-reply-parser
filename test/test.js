@@ -237,6 +237,16 @@ exports.test_email_22 = function(test) {
 	test.done();
 };
 
+exports.test_email_23 = function(test) {
+	let email = get_email("email_23");
+
+    let fragments = email.getFragments();
+
+	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+
+	test.done();
+};
+
 exports.test_email_portuguese = function(test) {
 	let email = get_email("email_portuguese");
 
