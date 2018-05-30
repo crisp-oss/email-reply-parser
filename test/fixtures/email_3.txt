@@ -49,7 +49,7 @@ On 01/03/11 7:07 PM, Russell Brown wrote:
 >
 
 
-_______________________________________________
+__
 riak-users mailing list
 riak-users@lists.basho.com
 http://lists.basho.com/mailman/listinfo/riak-users_lists.basho.com

@@ -7,7 +7,7 @@ I am currently using the Java HTTP API.
 -Abhishek Kona
 
 
-_______________________________________________
+__
 riak-users mailing list
 riak-users@lists.basho.com
 http://lists.basho.com/mailman/listinfo/riak-users_lists.basho.com

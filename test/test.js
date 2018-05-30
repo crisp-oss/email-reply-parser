@@ -354,3 +354,15 @@ exports.test_email_emoji = function(test) {
 
 	test.done();
 };
+
+exports.test_email_not_a_signature = function(test) {
+	let email = get_email("email_not_a_signature");
+
+    let fragments = email.getFragments();
+
+   	console.log(email.getVisibleText())
+
+	test.done();
+};
+
+

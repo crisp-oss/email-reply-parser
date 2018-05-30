@@ -1,0 +1,16 @@
+Dear XXXXX:
+
+This is a reminder that the following services in your account 'XXXXXXXXXX' are scheduled to expire soon and will be discontinued:
+
+Service Expire Date Description 
+-------------------------------------------------------------- 
+Registration Jun 27, 2018 github.com
+Registration Jun 27, 2018 twitter.com 
+Registration Jun 27, 2018 facebok.com 
+
+All dates are in MMM DD, YYYY format. 
+
+If you have any questions, please reply to this e-mail. Thank you for using our domain name services.
+
+Sincerely,
+Super Domain Name Manager
