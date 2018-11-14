@@ -360,7 +360,15 @@ exports.test_email_not_a_signature = function(test) {
 
     let fragments = email.getFragments();
 
-   	console.log(email.getVisibleText())
+	test.done();
+};
+
+exports.test_email_24 = function(test) {
+	let email = get_email("email_24");
+
+    let fragments = email.getFragments();
+
+	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
 	test.done();
 };
