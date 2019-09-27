@@ -373,4 +373,58 @@ exports.test_email_24 = function(test) {
 	test.done();
 };
 
+exports.test_email_outlook = function(test) {
+	let email = get_email("email_outlook_split_line_from");
 
+	let fragments = email.getFragments();
+
+	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+	test.equal(2, fragments.length);
+
+	test.done();
+}
+
+exports.test_email_gmail = function(test) {
+	let email = get_email("email_gmail_split_line_from");
+
+	let fragments = email.getFragments();
+
+	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+	test.equal(2, fragments.length);
+
+	test.done();
+}
+
+exports.text_email_reply_header = function(test) {
+	let email = get_email("email_reply_header");
+
+	let fragments = email.getFragments();
+
+	const firstFragmentRegex = /^On the other hand/m;
+	const secondFragmentRegex = /^On Wed, Dec 9/m;
+
+	test.equal(firstFragmentRegex.test(fragments[0].toString().trim()), true)
+	test.equal(secondFragmentRegex.test(fragments[1].toString().trim()), true)
+
+	test.done();
+}
+
+exports.text_email_ios_outlook = function(test) {
+	let email = get_email("email_ios_outlook");
+
+	let fragments = email.getFragments();
+	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+	test.equal(3, fragments.length);
+
+	test.done();
+}
+
+exports.text_email_msn = function(test) {
+	let email = get_email("email_msn");
+
+	let fragments = email.getFragments();
+	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+	test.equal(2, fragments.length);
+
+	test.done();
+}
