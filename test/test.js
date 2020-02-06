@@ -409,16 +409,6 @@ exports.text_email_reply_header = function(test) {
 	test.done();
 }
 
-exports.text_email_ios_outlook = function(test) {
-	let email = get_email("email_ios_outlook");
-
-	let fragments = email.getFragments();
-	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
-	test.equal(3, fragments.length);
-
-	test.done();
-}
-
 exports.text_email_msn = function(test) {
 	let email = get_email("email_msn");
 
@@ -429,8 +419,18 @@ exports.text_email_msn = function(test) {
 	test.done();
 }
 
-exports.text_email_android_outlook_fr = function(test) {
-	let email = get_email("email_android_outlook_fr");
+exports.text_email_ios_outlook_en = function(test) {
+	let email = get_email("email_ios_outlook_en");
+
+	let fragments = email.getFragments();
+	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+	test.equal(3, fragments.length);
+
+	test.done();
+}
+
+exports.text_email_ios_outlook_fr = function(test) {
+	let email = get_email("email_ios_outlook_fr");
 
 	let fragments = email.getFragments();
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
@@ -441,6 +441,16 @@ exports.text_email_android_outlook_fr = function(test) {
 
 exports.text_email_android_outlook_en = function(test) {
 	let email = get_email("email_android_outlook_en");
+
+	let fragments = email.getFragments();
+	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+	test.equal(3, fragments.length);
+
+	test.done();
+}
+
+exports.text_email_android_outlook_fr = function(test) {
+	let email = get_email("email_android_outlook_fr");
 
 	let fragments = email.getFragments();
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
