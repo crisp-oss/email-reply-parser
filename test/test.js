@@ -107,6 +107,18 @@ exports.test_deals_with_multiline_reply_headers = function(test){
 	test.done();
 };
 
+exports.test_deals_with_multiline_reply_headers_de = function(test){
+    let email = get_email("email_multiline_reply_headers_de");
+
+    let fragments = email.getFragments();
+
+	test.equal(true, /^I get/.test(fragments[0]));
+	test.equal(true,/^Am/.test(fragments[1]));
+	test.equal(true, /Was this/.test(fragments[1]));
+
+	test.done();
+};
+
 exports.test_email_with_italian = function(test) {
 	let email = get_email("email_7");
 
