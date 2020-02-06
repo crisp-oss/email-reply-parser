@@ -9,7 +9,7 @@
   "author": "Crisp IM Inc",
   "license": "MIT",
   "devDependencies": {
-    "nodeunit": "v0.11.1",
-    "underscore": "v1.8.3"
+    "nodeunit": "v0.11.3",
+    "underscore": "v1.9.2"
   }
 }
