@@ -408,3 +408,13 @@ exports.text_email_msn = function(test) {
 
 	test.done();
 }
+
+exports.text_email_zoho = function(test) {
+	let email = get_email("email_zoho");
+
+	let fragments = email.getFragments();
+
+	test.equal("What is the best way to clear a Riak bucket of all key, values after\nrunning a test?\n", fragments[0].toString());
+
+	test.done();
+}

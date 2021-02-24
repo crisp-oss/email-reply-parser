@@ -1,12 +1,12 @@
 {
   "name": "email-reply-parser",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Node library for parsing plain text email content. Based on https://github.com/willdurand/EmailReplyParser",
   "main": "lib/emailreplyparser.js",
   "scripts": {
     "test": "node ./node_modules/nodeunit/bin/nodeunit test/test.js"
   },
-  "author": "Crisp IM Inc",
+  "author": "Crisp IM SARL",
   "license": "MIT",
   "devDependencies": {
     "nodeunit": "v0.11.1",
