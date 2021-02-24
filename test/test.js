@@ -21,42 +21,22 @@ function get_raw_email(name) {
 exports.test_reads_simple_body = function(test){
     reply = get_email("email_1");
 
-    test.equal(3, reply.fragments.length);
+    test.equal(2, reply.fragments.length);
 
-	test.deepEqual([false, false, false], _.map(reply.fragments, function(f) { return f.isQuoted; }));
-	test.deepEqual([false, true, true], _.map(reply.fragments, function(f) { return f.isSignature; }));
-	test.deepEqual([false, true, true], _.map(reply.fragments, function(f) { return f.isHidden; }));
+	test.deepEqual([false, false], _.map(reply.fragments, function(f) { return f.isQuoted; }));
+	test.deepEqual([false, true], _.map(reply.fragments, function(f) { return f.isHidden; }));
 
-    test.equal("Hi folks\n\nWhat is the best way to clear a Riak bucket of all key, values after\nrunning a test?\nI am currently using the Java HTTP API.\n", reply.fragments[0].toString());
+    test.equal("Hi folks\n\nWhat is the best way to clear a Riak bucket of all key, values after\nrunning a test?\nI am currently using the Java HTTP API.\n\n-Abhishek Kona\n\n", reply.fragments[0].toString());
 
-    test.equal("-Abhishek Kona\n\n", reply.fragments[1].toString());
-	test.done();
+   	test.done();
 };
 
 exports.test_reads_top_post = function(test){
     let email = get_email("email_3");
 
     let fragments = email.getFragments();
-	test.equal(5, fragments.length);
-	test.equal(false, fragments[0].isQuoted);
-	test.equal(false, fragments[1].isQuoted);
-	test.equal(true, fragments[2].isQuoted);
-	test.equal(false, fragments[3].isQuoted);
-	test.equal(false, fragments[4].isQuoted);
-	test.equal(false, fragments[0].isSignature);
-	test.equal(true, fragments[1].isSignature);
-	test.equal(false, fragments[2].isSignature);
-	test.equal(false, fragments[3].isSignature);
-	test.equal(true, fragments[4].isSignature);
-	test.equal(false, fragments[0].isHidden);
-	test.equal(true, fragments[1].isHidden);
-	test.equal(true, fragments[2].isHidden);
-	test.equal(true, fragments[3].isHidden);
-	test.equal(true, fragments[4].isHidden);
-	test.equal(true, /^Oh thanks.\n\nHaving/.test(fragments[0]));
-	test.equal(true, /^-A/.test(fragments[1]));
-	test.equal(true, /^On [^\:]+\:/.test(fragments[2]));
-	test.equal(true, /^_/.test(fragments[4]));
+
+    test.equal("Hi folks\n\nWhat is the best way to clear a Riak bucket of all key, values after\nrunning a test?\nI am currently using the Java HTTP API.\n\n-Abhishek Kona\n\n", reply.fragments[0].toString());
    
 	test.done();
 };
@@ -350,7 +330,7 @@ exports.test_email_emoji = function(test) {
 
     let fragments = email.getFragments();
 
-    test.equal(email.getVisibleText(), "🎉\n");
+    test.equal(email.getVisibleText(), "🎉\n\n—\nJohn Doe\nCEO at Pandaland\n\n@pandaland");
 
 	test.done();
 };
