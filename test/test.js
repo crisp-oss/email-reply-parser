@@ -418,3 +418,13 @@ exports.text_email_zoho = function(test) {
 
 	test.done();
 }
+
+exports.text_email_regards = function(test) {
+	let email = get_email("email_with_regards");
+
+	let fragments = email.getFragments();
+
+	test.equal("Hi,\n\nI still have the same problem....\n\nCan you help?\n", fragments[0].toString());
+
+	test.done();
+}
