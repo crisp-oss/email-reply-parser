@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/crisp-dev/email-reply-parser.svg?branch=master)](https://travis-ci.org/crisp-dev/email-reply-parser) [![NPM](https://img.shields.io/npm/v/email-reply-parser.svg)](https://www.npmjs.com/package/email-reply-parser])
 
-**Email Reply Parser is a library to parse plain-text email replies and extract content**
+**Email Reply Parser is a node library to parse plain-text email replies and extract content**
 
 This library supports most email replies, signatures and locales.
 
@@ -27,8 +27,16 @@ Install the project using NPM:
 npm install --save email-reply-parser
 ```
 
-## Usage
+## Features
 
+This library is used at [Crisp](https://crisp.chat/) everyday with around 1 million inbound emails. Over the years, we improved this library so tt can work with most emails.
+
+- Strip email replies like `On DATE, NAME <EMAIL> wrote:`
+- Supports around **10 locales**, including English, French, Spanish, Portuguese, Italian, Japanese, Chinese.
+- Removes signatures like `Sent from my iPhone`
+- Removes signatures like `Best wishes`
+
+## Usage
 
 ``` javascript
 var EmailReplyParser = require("email-reply-parser");
@@ -37,7 +45,6 @@ var email =  new EmailReplyParser().read(MY_EMAIL_STRING);
 
 console.log(email.getVisibleText());
 ```
-
 
 ## Contributing
 
