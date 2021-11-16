@@ -428,3 +428,26 @@ exports.text_email_regards = function(test) {
 
 	test.done();
 }
+
+exports.test_email_fr_multiline = function(test) {
+	let email = get_email("email_fr_multiline");
+
+	let fragments = email.getFragments();
+
+	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+	test.equal(2, fragments.length);
+
+	test.done();
+}
+
+
+exports.test_email_en_multiline_2 = function(test) {
+	let email = get_email("email_en_multiline_2");
+
+	let fragments = email.getFragments();
+
+	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+	test.equal(2, fragments.length);
+
+	test.done();
+}
