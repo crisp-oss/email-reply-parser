@@ -1,6 +1,6 @@
 # Email Reply Parser
 
-[![Build Status](https://travis-ci.org/crisp-dev/email-reply-parser.svg?branch=master)](https://travis-ci.org/crisp-dev/email-reply-parser) [![NPM](https://img.shields.io/npm/v/email-reply-parser.svg)](https://www.npmjs.com/package/email-reply-parser])
+[![Test and Build](https://github.com/crisp-oss/email-reply-parser/workflows/Test%20and%20Build/badge.svg?branch=master)](https://github.com/crisp-oss/email-reply-parser/actions?query=workflow%3A%22Test+and+Build%22) [![NPM](https://img.shields.io/npm/v/email-reply-parser.svg)](https://www.npmjs.com/package/email-reply-parser) [![Downloads](https://img.shields.io/npm/dt/email-reply-parser.svg)](https://www.npmjs.com/package/email-reply-parser)
 
 **Email Reply Parser is a node library to parse plain-text email replies and extract content**
 

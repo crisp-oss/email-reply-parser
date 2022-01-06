@@ -3,6 +3,11 @@
   "version": "1.3.2",
   "description": "Node library for parsing plain text email content. Based on https://github.com/willdurand/EmailReplyParser",
   "main": "lib/emailreplyparser.js",
+  "homepage": "https://github.com/crisp-oss/email-reply-parser",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/crisp-oss/email-reply-parser.git"
+  },
   "scripts": {
     "test": "node ./node_modules/nodeunit/bin/nodeunit test/test.js"
   },
