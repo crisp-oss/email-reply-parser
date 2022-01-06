@@ -6,6 +6,8 @@
 
 This library supports most email replies, signatures and locales.
 
+**😘 Maintainer**: [@baptistejamin](https://github.com/baptistejamin)
+
 ## Who uses it?
 
 <table>
