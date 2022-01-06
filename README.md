@@ -31,7 +31,7 @@ npm install --save email-reply-parser
 
 ## Features
 
-This library is used at [Crisp](https://crisp.chat/) everyday with around 1 million inbound emails. Over the years, we improved this library so tt can work with most emails.
+This library is used at [Crisp](https://crisp.chat/) everyday with around 1 million inbound emails. Over the years, we improved this library so it can work with most emails.
 
 - Strip email replies like `On DATE, NAME <EMAIL> wrote:`
 - Supports around **10 locales**, including English, French, Spanish, Portuguese, Italian, Japanese, Chinese.
@@ -50,7 +50,7 @@ console.log(email.getVisibleText());
 
 ## Contributing
 
-Feel free to fork this project and submit fixes. We may adapt your code to fit the codebase. 
+Feel free to fork this project and submit fixes. We may adapt your code to fit the codebase.
 
 You can run unit tests using:
 
@@ -66,6 +66,5 @@ npm test
 
 ## License
 
-email-reply-parser is released under the MIT License. See the bundled LICENSE
-file for details.
+email-reply-parser is released under the MIT License. See the bundled LICENSE file for details.
 
