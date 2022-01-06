@@ -11,6 +11,9 @@
   "scripts": {
     "test": "node ./node_modules/nodeunit/bin/nodeunit test/test.js"
   },
+  "engines": {
+    "node": ">= 10.0.0"
+  },
   "author": "Crisp IM SARL",
   "license": "MIT",
   "dependencies": {
