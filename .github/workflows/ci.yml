@@ -1,6 +1,10 @@
 on: [push, pull_request]
 
-name: Test and Build
+name: CI
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -44,4 +48,3 @@ jobs:
 
       - name: Run tests
         run: pnpm run test
-
