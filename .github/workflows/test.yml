@@ -7,34 +7,41 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node-version: [10.x, 12.x, 14.x, 16.x]
+        node-version: [10.x, 12.x, 14.x, 16.x, 18.x]
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: 🏗 Setup repository
+        uses: actions/checkout@v3
 
-      - name: Install NodeJS
-        uses: actions/setup-node@v1
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Verify versions
-        run: node --version && npm --version && node -p process.versions.v8
-
-      - name: Cache build artifacts
-        id: cache-node
-        uses: actions/cache@v2
+      - name: 🏗 Setup pnpm
+        uses: pnpm/action-setup@v2
         with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-node-${{ matrix.node-version }}
+          version: ${{ inputs.pnpm-version }}
 
-      - name: Install dependencies
-        run: npm install
+      - name: 🔎 Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: ♻️ Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-${{ matrix.node.version }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.node.version }}-pnpm-store-
+
+      - name: 📦 Install dependencies
+        run: pnpm install
 
       - name: Run tests
-        run: npm test
+        run: pnpm run test
+
