@@ -491,3 +491,15 @@ exports.test_email_en_multiline_2 = function(test) {
 
 	test.done();
 }
+
+exports.test_email_dash_separators = function (test) {
+    let emails = ["french", "danish"].map((lang) =>
+        get_email(`email_${lang}_dash_separator`)
+    );
+    for (const email of emails) {
+        let fragments = email.getFragments();
+        test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+        test.equal(2, fragments.length);
+    }
+    test.done();
+};

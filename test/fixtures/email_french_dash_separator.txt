@@ -1,0 +1,10 @@
+Fusce bibendum, quam hendrerit sagittis tempor, dui turpis tempus erat, pharetra sodales ante sem sit amet metus.
+Nulla malesuada, orci non vulputate lobortis, massa felis pharetra ex, convallis consectetur ex libero eget ante.
+Nam vel turpis posuere, rhoncus ligula in, venenatis orci. Duis interdum venenatis ex a rutrum.
+Duis ut libero eu lectus consequat consequat ut vel lorem. Vestibulum convallis lectus urna,
+et mollis ligula rutrum quis. Fusce sed odio id arcu varius aliquet nec nec nibh.
+
+-------- Message d'origine --------
+De : A B C <abc@abc.org>
+Date : 23/06/24  10:46  (GMT+01:00)
+À : abc@abc.be Objet : Abc vous a envoyé un message !
