@@ -1,5 +1,5 @@
-var fs 			     = require("fs");
-var _  				 = require("underscore");
+var fs 			         = require("fs");
+var _  				       = require("underscore");
 var EmailReplyParser = require("../lib/emailreplyparser");
 
 const COMMON_FIRST_FRAGMENT = 'Fusce bibendum, quam hendrerit sagittis tempor, dui turpis tempus erat, pharetra sodales ante sem sit amet metus.\n\
@@ -14,30 +14,26 @@ function get_email(name) {
 	return new EmailReplyParser().read(data);
 }
 
-function get_raw_email(name) {
-  	return fs.readFileSync(__dirname + "/fixtures/" + name + ".txt", "utf-8");
-}
-
 exports.test_reads_simple_body = function(test){
-    reply = get_email("email_1");
+  reply = get_email("email_1");
 
-    test.equal(2, reply.fragments.length);
+  test.equal(2, reply.fragments.length);
 
 	test.deepEqual([false, false], _.map(reply.fragments, function(f) { return f.isQuoted(); }));
 	test.deepEqual([false, true], _.map(reply.fragments, function(f) { return f.isHidden(); }));
 
-    test.equal("Hi folks\n\nWhat is the best way to clear a Riak bucket of all key, values after\nrunning a test?\nI am currently using the Java HTTP API.\n\n-Abhishek Kona\n\n", reply.fragments[0].toString());
+   test.equal("Hi folks\n\nWhat is the best way to clear a Riak bucket of all key, values after\nrunning a test?\nI am currently using the Java HTTP API.\n\n-Abhishek Kona\n\n", reply.fragments[0].toString());
 
-   	test.done();
+  test.done();
 };
 
 exports.test_reads_top_post = function(test){
-    let email = get_email("email_3");
+	let email = get_email("email_3");
 
-    let fragments = email.getFragments();
+	let fragments = email.getFragments();
 
-    test.equal("Hi folks\n\nWhat is the best way to clear a Riak bucket of all key, values after\nrunning a test?\nI am currently using the Java HTTP API.\n\n-Abhishek Kona\n\n", reply.fragments[0].toString());
-   
+	test.equal("Hi folks\n\nWhat is the best way to clear a Riak bucket of all key, values after\nrunning a test?\nI am currently using the Java HTTP API.\n\n-Abhishek Kona\n\n", reply.fragments[0].toString());
+	
 	test.done();
 };
 
@@ -56,9 +52,9 @@ exports.test_reads_bottom_post = function(test){
 };
 
 exports.test_recognizes_data_string_above_quote = function(test){
-    let email = get_email("email_4");
+	let email = get_email("email_4");
 
-    let fragments = email.getFragments();
+	let fragments = email.getFragments();
 
 	test.equal(true, /^Awesome/.test(fragments[0]));
 	test.equal(true,/^On/.test(fragments[1]));
@@ -67,18 +63,18 @@ exports.test_recognizes_data_string_above_quote = function(test){
 };
 
 exports.test_complex_body_with_only_one_fragment = function(test){
-    let email = get_email("email_5");
+	let email = get_email("email_5");
 
-    let fragments = email.getFragments();
+	let fragments = email.getFragments();
 
 	test.equal(1, fragments.length);
 	test.done();
 };
 
 exports.test_deals_with_multiline_reply_headers = function(test){
-    let email = get_email("email_6");
+	let email = get_email("email_6");
 
-    let fragments = email.getFragments();
+	let fragments = email.getFragments();
 
 	test.equal(true, /^I get/.test(fragments[0]));
 	test.equal(true,/^On/.test(fragments[1]));
@@ -90,7 +86,7 @@ exports.test_deals_with_multiline_reply_headers = function(test){
 exports.test_email_with_italian = function(test) {
 	let email = get_email("email_7");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -100,7 +96,7 @@ exports.test_email_with_italian = function(test) {
 exports.test_email_with_dutch = function(test) {
 	let email = get_email("email_8");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -110,7 +106,7 @@ exports.test_email_with_dutch = function(test) {
 exports.test_email_with_signature = function(test) {
 	let email = get_email("email_9");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -120,7 +116,7 @@ exports.test_email_with_signature = function(test) {
 exports.test_email_with_hotmail = function(test) {
 	let email = get_email("email_10");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -130,7 +126,7 @@ exports.test_email_with_hotmail = function(test) {
 exports.test_email_whitespace_before_header = function(test) {
 	let email = get_email("email_11");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -140,7 +136,7 @@ exports.test_email_whitespace_before_header = function(test) {
 exports.test_email_square_brackets = function(test) {
 	let email = get_email("email_12");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -150,7 +146,7 @@ exports.test_email_square_brackets = function(test) {
 exports.test_email_da_into_italian = function(test) {
 	let email = get_email("email_13");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -160,7 +156,7 @@ exports.test_email_da_into_italian = function(test) {
 exports.test_email_header_polish = function(test) {
 	let email = get_email("email_14");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -170,7 +166,7 @@ exports.test_email_header_polish = function(test) {
 exports.test_email_sent_from_my = function(test) {
 	let email = get_email("email_15");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -180,7 +176,7 @@ exports.test_email_sent_from_my = function(test) {
 exports.test_email_header_polish_with_dnia_and_napisala = function(test) {
 	let email = get_email("email_16");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -190,7 +186,7 @@ exports.test_email_header_polish_with_dnia_and_napisala = function(test) {
 exports.test_email_header_polish_with_date_in_iso8601 = function(test) {
 	let email = get_email("email_17");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -200,7 +196,7 @@ exports.test_email_header_polish_with_date_in_iso8601 = function(test) {
 exports.test_email_outlook_en = function(test) {
 	let email = get_email("email_18");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -210,7 +206,7 @@ exports.test_email_outlook_en = function(test) {
 exports.test_email_22 = function(test) {
 	let email = get_email("email_22");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -220,7 +216,7 @@ exports.test_email_22 = function(test) {
 exports.test_email_23 = function(test) {
 	let email = get_email("email_23");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -230,7 +226,7 @@ exports.test_email_23 = function(test) {
 exports.test_email_25 = function(test) {
 	let email = get_email("email_25");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -240,7 +236,7 @@ exports.test_email_25 = function(test) {
 exports.test_email_26 = function(test) {
 	let email = get_email("email_26");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -250,7 +246,7 @@ exports.test_email_26 = function(test) {
 exports.test_email_portuguese = function(test) {
 	let email = get_email("email_portuguese");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -260,7 +256,7 @@ exports.test_email_portuguese = function(test) {
 exports.test_email_german = function(test) {
 	let email = get_email("email_german");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -270,7 +266,7 @@ exports.test_email_german = function(test) {
 exports.test_email_german_2 = function(test) {
 	let email = get_email("email_german_2");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -280,7 +276,7 @@ exports.test_email_german_2 = function(test) {
 exports.test_email_gmail_no = function(test) {
 	let email = get_email("email_norwegian_gmail");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -290,7 +286,7 @@ exports.test_email_gmail_no = function(test) {
 exports.test_email_finnish = function(test) {
 	let email = get_email("email_finnish");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -300,7 +296,7 @@ exports.test_email_finnish = function(test) {
 exports.test_email_with_correct_signature = function(test) {
 	let email = get_email("correct_sig");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(2, fragments.length);
 	test.equal(false, fragments[1].isQuoted());
@@ -317,7 +313,7 @@ exports.test_email_with_correct_signature = function(test) {
 exports.test_reads_email_with_signature_with_no_empty_line_above = function(test) {
 	let email = get_email("sig_no_empty_line");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(2, fragments.length);
 	test.equal(false, fragments[0].isQuoted());
@@ -337,7 +333,7 @@ exports.test_reads_email_with_signature_with_no_empty_line_above = function(test
 exports.test_one_is_not_one = function(test) {
 	let email = get_email("email_one_is_not_on");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(true, /One outstanding question/.test(fragments[0]));
 	test.equal(true, /^On Oct 1, 2012/.test(fragments[1]));
@@ -348,9 +344,7 @@ exports.test_one_is_not_one = function(test) {
 exports.test_sent_from = function(test) {
 	let email = get_email("email_sent_from");
 
-    let fragments = email.getFragments();
-
-    test.equal(email.getVisibleText(), "Hi it can happen to any texts you type, as long as you type in between words or paragraphs.\n");
+  test.equal(email.getVisibleText(), "Hi it can happen to any texts you type, as long as you type in between words or paragraphs.\n");
 
 	test.done();
 };
@@ -358,9 +352,7 @@ exports.test_sent_from = function(test) {
 exports.test_email_emoji = function(test) {
 	let email = get_email("email_emoji");
 
-    let fragments = email.getFragments();
-
-    test.equal(email.getVisibleText(), "🎉\n\n—\nJohn Doe\nCEO at Pandaland\n\n@pandaland");
+  test.equal(email.getVisibleText(), "🎉\n\n—\nJohn Doe\nCEO at Pandaland\n\n@pandaland");
 
 	test.done();
 };
@@ -368,7 +360,9 @@ exports.test_email_emoji = function(test) {
 exports.test_email_not_a_signature = function(test) {
 	let email = get_email("email_not_a_signature");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
+
+	test.equal(fragments[0].isSignature(), false);
 
 	test.done();
 };
@@ -376,7 +370,7 @@ exports.test_email_not_a_signature = function(test) {
 exports.test_email_24 = function(test) {
 	let email = get_email("email_24");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
 
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 
@@ -423,6 +417,7 @@ exports.text_email_ios_outlook = function(test) {
 	let email = get_email("email_ios_outlook");
 
 	let fragments = email.getFragments();
+
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 	test.equal(3, fragments.length);
 
@@ -433,6 +428,7 @@ exports.text_email_msn = function(test) {
 	let email = get_email("email_msn");
 
 	let fragments = email.getFragments();
+
 	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
 	test.equal(2, fragments.length);
 
@@ -503,4 +499,3 @@ exports.test_email_original_message_2 = function(test) {
 
 	test.done();
 }
-
