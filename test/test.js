@@ -509,3 +509,25 @@ exports.test_email_original_message_2 = function(test) {
 
 	test.done();
 }
+
+exports.test_email_original_message_danish_dash = function(test) {
+	let email = get_email("email_danish_dash_separator");
+
+	let fragments = email.getFragments();
+
+	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+	test.equal(2, fragments.length);
+
+	test.done();
+}
+
+exports.test_email_original_message_french_dash = function(test) {
+	let email = get_email("email_french_dash_separator");
+
+	let fragments = email.getFragments();
+
+	test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+	test.equal(2, fragments.length);
+
+	test.done();
+}
