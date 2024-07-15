@@ -23,8 +23,8 @@ exports.test_reads_simple_body = function(test){
 
     test.equal(2, reply.fragments.length);
 
-	test.deepEqual([false, false], _.map(reply.fragments, function(f) { return f.isQuoted; }));
-	test.deepEqual([false, true], _.map(reply.fragments, function(f) { return f.isHidden; }));
+	test.deepEqual([false, false], _.map(reply.fragments, function(f) { return f.isQuoted(); }));
+	test.deepEqual([false, true], _.map(reply.fragments, function(f) { return f.isHidden(); }));
 
     test.equal("Hi folks\n\nWhat is the best way to clear a Riak bucket of all key, values after\nrunning a test?\nI am currently using the Java HTTP API.\n\n-Abhishek Kona\n\n", reply.fragments[0].toString());
 
@@ -293,11 +293,11 @@ exports.test_email_with_correct_signature = function(test) {
     let fragments = email.getFragments();
 
 	test.equal(2, fragments.length);
-	test.equal(false, fragments[1].isQuoted);
-	test.equal(false, fragments[0].isSignature);
-	test.equal(true, fragments[1].isSignature);
-	test.equal(false, fragments[0].isHidden);
-	test.equal(true, fragments[1].isHidden);
+	test.equal(false, fragments[1].isQuoted());
+	test.equal(false, fragments[0].isSignature());
+	test.equal(true, fragments[1].isSignature());
+	test.equal(false, fragments[0].isHidden());
+	test.equal(true, fragments[1].isHidden());
 
 	test.equal(true, /^--\nrick/.test(fragments[1]));
 
@@ -310,14 +310,14 @@ exports.test_reads_email_with_signature_with_no_empty_line_above = function(test
     let fragments = email.getFragments();
 
 	test.equal(2, fragments.length);
-	test.equal(false, fragments[0].isQuoted);
-	test.equal(false, fragments[1].isQuoted);
+	test.equal(false, fragments[0].isQuoted());
+	test.equal(false, fragments[1].isQuoted());
 
-	test.equal(false, fragments[0].isSignature);
-	test.equal(true, fragments[1].isSignature);
+	test.equal(false, fragments[0].isSignature());
+	test.equal(true, fragments[1].isSignature());
 
-	test.equal(false, fragments[0].isHidden);
-	test.equal(true, fragments[1].isHidden);
+	test.equal(false, fragments[0].isHidden());
+	test.equal(true, fragments[1].isHidden());
 
 	test.equal(true, /^--\nrick/.test(fragments[1]));
 
