@@ -3,6 +3,9 @@ on:
     tags:
       - "v*.*.*"
 
+permissions:
+  id-token: write
+
 name: Build and Release
 
 jobs:
@@ -16,13 +19,13 @@ jobs:
       - name: Install NodeJS
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 20.x
           registry-url: https://registry.npmjs.org
 
       - name: Verify versions
         run: node --version && npm --version && node -p process.versions.v8
 
       - name: Release package
-        run: npm publish --ignore-scripts
+        run: npm publish --ignore-scripts --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
