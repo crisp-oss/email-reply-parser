@@ -17,7 +17,8 @@
   "author": "Crisp IM SAS",
   "license": "MIT",
   "dependencies": {
-    "re2": "1.21.3"
+    "re2": "1.21.3",
+    "xregexp": "^5.1.1"
   },
   "devDependencies": {
     "nodeunit": "v0.11.3",
