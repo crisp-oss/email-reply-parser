@@ -1,12 +1,12 @@
 {
-  "name": "email-reply-parser",
-  "version": "1.8.2",
-  "description": "Node library for parsing plain text email content. Based on https://github.com/willdurand/EmailReplyParser",
+  "name": "email-reply-parser-browser",
+  "version": "1.0.0",
+  "description": "Browser library for parsing plain text email content. Based on https://github.com/crisp-oss/email-reply-parser",
   "main": "lib/emailreplyparser.js",
-  "homepage": "https://github.com/crisp-oss/email-reply-parser",
+  "homepage": "https://github.com/3LOK/email-reply-parser-browser",
   "repository": {
     "type": "git",
-    "url": "git://github.com/crisp-oss/email-reply-parser.git"
+    "url": "git://github.com/3LOK/email-reply-parser-browser.git"
   },
   "scripts": {
     "test": "node ./node_modules/nodeunit/bin/nodeunit test/test.js"
@@ -17,7 +17,6 @@
   "author": "Crisp IM SAS",
   "license": "MIT",
   "dependencies": {
-    "re2": "1.21.3"
   },
   "devDependencies": {
     "nodeunit": "v0.11.3",
