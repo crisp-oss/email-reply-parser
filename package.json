@@ -16,11 +16,17 @@
   },
   "author": "Crisp IM SAS",
   "license": "MIT",
-  "dependencies": {
-    "re2": "1.21.3"
-  },
   "devDependencies": {
     "nodeunit": "v0.11.3",
+    "re2": "1.21.4",
     "underscore": "v1.13.6"
+  },
+  "peerDependencies": {
+    "re2": "1.21.4"
+  },
+  "peerDependenciesMeta": {
+    "re2": {
+      "optional": true
+    }
   }
 }
