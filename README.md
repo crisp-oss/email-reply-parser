@@ -29,6 +29,12 @@ Install the project using NPM:
 npm install --save email-reply-parser
 ```
 
+## RE2 Support
+
+By default, the library relies on the [RE2](https://github.com/uhop/node-re2) regex engine, which provides better performance and avoids issues like [ReDOS](https://en.wikipedia.org/wiki/ReDoS). By default, RE2 will be installed as a peer dependency.
+
+If you want to explicitly exclude RE2, then `npm uninstall re2`.
+
 ## Features
 
 This library is used at [Crisp](https://crisp.chat/) everyday with around 1 million inbound emails. Over the years, we improved this library so it can work with most emails.
