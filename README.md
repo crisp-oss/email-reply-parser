@@ -12,7 +12,7 @@ This library supports most email replies, signatures and locales.
 
 <table>
 <tr>
-<td align="center"><a href="https://crisp.chat/"><img src="https://crisp.chat/favicon-256x256.png" height="64" /></a></td>
+<td align="center"><a href="https://crisp.chat/"><img src="https://crisp.chat/favicons/favicon-256x256.png" height="64" /></a></td>
 </tr>
 <tr>
 <td align="center">Crisp</td>
