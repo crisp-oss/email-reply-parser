@@ -1,0 +1,27 @@
+Thank you very much.
+
+here is the code:
+
+> console.log("A")
+> console.log("B")
+>
+> {
+>     "summary": {
+>         "totalPartnershipsCount": 0
+>     },
+>     "partnerships": []
+> }
+
+Baptiste
+
+On Dec 16, 2011, at 12:47 PM, Corey Donohoe
+<reply@reply.github.com>
+wrote:
+
+> Was this caching related or fixed already?  I get proper rendering here.
+>
+> ![](https://img.skitch.com/20111216-m9munqjsy112yqap5cjee5wr6c.jpg)
+>
+> ---
+> Reply to this email directly or view it on GitHub:
+> https://github.com/github/github/issues/2278#issuecomment-3182418
