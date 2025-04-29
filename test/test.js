@@ -516,6 +516,15 @@ exports.test_email_fr_multiline = function(test) {
   test.done();
 }
 
+exports.test_email_fr_2 = function(test) {
+  let email = get_email("email_french_2");
+
+  let text = email.getVisibleText().trim();
+
+  test.equal(COMMON_FIRST_FRAGMENT, text);
+
+  test.done();
+}
 
 exports.test_email_en_multiline_2 = function(test) {
   let email = get_email("email_en_multiline_2");
