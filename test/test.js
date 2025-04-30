@@ -313,6 +313,16 @@ exports.test_email_italian = function(test) {
   test.done();
 };
 
+exports.test_email_russian = function(test) {
+  let email = get_email("email_russian");
+
+  let fragments = email.getFragments();
+
+  test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+
+  test.done();
+};
+
 exports.test_email_with_correct_signature = function(test) {
   let email = get_email("correct_sig");
 
