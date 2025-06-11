@@ -15,14 +15,14 @@ function get_email(name) {
 }
 
 exports.test_reads_simple_body = function(test){
-  reply = get_email("email_1");
+  let reply = get_email("email_1");
 
   test.equal(2, reply.fragments.length);
 
   test.deepEqual([false, false], _.map(reply.fragments, function(f) { return f.isQuoted(); }));
   test.deepEqual([false, true], _.map(reply.fragments, function(f) { return f.isHidden(); }));
 
-   test.equal("Hi folks\n\nWhat is the best way to clear a Riak bucket of all key, values after\nrunning a test?\nI am currently using the Java HTTP API.\n\n-Abhishek Kona\n\n", reply.fragments[0].toString());
+  test.equal("Hi folks\n\nWhat is the best way to clear a Riak bucket of all key, values after\nrunning a test?\nI am currently using the Java HTTP API.\n\n-Abhishek Kona\n\n", reply.fragments[0].toString());
 
   test.done();
 };
@@ -38,9 +38,9 @@ exports.test_reads_top_post = function(test){
 };
 
 exports.test_reads_bottom_post = function(test){
-    let email = get_email("email_2");
+  let email = get_email("email_2");
 
-    let fragments = email.getFragments();
+  let fragments = email.getFragments();
   test.equal(6, fragments.length);
 
   test.equal("Hi,", fragments[0]);
