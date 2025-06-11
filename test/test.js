@@ -32,7 +32,7 @@ exports.test_reads_top_post = function(test){
 
   let fragments = email.getFragments();
 
-  test.equal("Hi folks\n\nWhat is the best way to clear a Riak bucket of all key, values after\nrunning a test?\nI am currently using the Java HTTP API.\n\n-Abhishek Kona\n\n", reply.fragments[0].toString());
+  test.equal("Oh thanks.\n\nHaving the function would be great.\n\n-Abhishek Kona\n", fragments[0].toString());
 
   test.done();
 };
