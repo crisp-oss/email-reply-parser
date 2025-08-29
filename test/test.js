@@ -590,3 +590,42 @@ exports.test_email_original_message_french_dash = function(test) {
 
   test.done();
 }
+
+exports.test_email_zendesk_225703 = function(test) {
+  let email = get_email("zendesk_225703");
+
+  let fragments = email.getFragments();
+
+  console.log(email.getVisibleText());
+
+  test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+  test.equal(2, fragments.length);
+
+  test.done();
+}
+
+exports.test_email_zendesk_225721 = function(test) {
+  let email = get_email("zendesk_225721");
+
+  let fragments = email.getFragments();
+
+  console.log(email.getVisibleText());
+
+  test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+  test.equal(2, fragments.length);
+
+  test.done();
+}
+
+exports.test_email_zendesk_225721 = function(test) {
+  let email = get_email("zendesk_225766");
+
+  let fragments = email.getFragments();
+
+  console.log(email.getVisibleText());
+
+  test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+  test.equal(2, fragments.length);
+
+  test.done();
+}
