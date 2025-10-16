@@ -18,11 +18,11 @@
   "license": "MIT",
   "devDependencies": {
     "nodeunit": "v0.11.3",
-    "re2": "1.21.4",
+    "re2": "1.22.1",
     "underscore": "v1.13.6"
   },
   "peerDependencies": {
-    "re2": "1.21.4"
+    "re2": "1.22.1"
   },
   "peerDependenciesMeta": {
     "re2": {
