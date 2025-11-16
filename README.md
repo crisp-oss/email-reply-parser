@@ -31,9 +31,19 @@ npm install --save email-reply-parser
 
 ## RE2 Support
 
-By default, the library relies on the [RE2](https://github.com/uhop/node-re2) regex engine, which provides better performance and avoids issues like [ReDOS](https://en.wikipedia.org/wiki/ReDoS). By default, RE2 will be installed as a peer dependency.
+This library uses the [RE2](https://github.com/uhop/node-re2) regex engine when available for better performance and [ReDoS](https://en.wikipedia.org/wiki/ReDoS) protection. It automatically falls back to native JavaScript `RegExp` if RE2 is unavailable or fails to load.
 
-If you want to explicitly exclude RE2, then `npm uninstall re2`.
+RE2 is an optional dependency installed by default. If you encounter native compilation issues or want to exclude it:
+
+```bash
+npm uninstall re2
+```
+
+After a Node.js upgrade, you may need to rebuild RE2:
+
+```bash
+npm rebuild re2
+```
 
 ## Features
 
@@ -52,6 +62,31 @@ var EmailReplyParser = require("email-reply-parser");
 var email =  new EmailReplyParser().read(MY_EMAIL_STRING);
 
 console.log(email.getVisibleText());
+```
+
+### Example
+
+``` javascript
+var EmailReplyParser = require("email-reply-parser");
+
+var emailContent = `Hi there,
+
+I appreciate your help with this issue.
+
+Best regards,
+John
+
+On Dec 16, 2024, at 12:47 PM, Support <support@example.com> wrote:
+
+> How can we help you today?
+> 
+> Thanks,
+> Support Team`;
+
+var email = new EmailReplyParser().read(emailContent);
+
+console.log(email.getVisibleText());
+// Output: "Hi there,\n\nI appreciate your help with this issue."
 ```
 
 ## Contributing
