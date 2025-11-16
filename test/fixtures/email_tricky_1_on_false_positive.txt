@@ -1,0 +1,7 @@
+On the surface, this looks like a quote header but it's not.
+
+On the other hand, we should be careful about edge cases.
+On average, this parser works well.
+
+On a separate note, I wanted to mention that performance is great.
+

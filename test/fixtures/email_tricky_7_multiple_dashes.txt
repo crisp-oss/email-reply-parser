@@ -1,0 +1,16 @@
+Here is my analysis:
+
+## Key Points
+----
+
+1. Performance improved by 50%
+2. Memory usage reduced
+
+----
+
+The dashes above are markdown formatting, not signatures.
+
+====
+
+Also these equal signs are just separators in my content.
+

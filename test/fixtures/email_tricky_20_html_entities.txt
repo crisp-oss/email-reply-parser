@@ -1,0 +1,7 @@
+The data should be &gt; 100 and &lt; 200.
+
+We need to ensure that &amp; symbols are handled correctly.
+
+On Dec 15, 2024, John &quot;Johnny&quot; Smith &lt;john@example.com&gt; wrote:
+> Previous message with HTML entities
+

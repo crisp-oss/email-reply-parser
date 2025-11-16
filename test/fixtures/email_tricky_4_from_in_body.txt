@@ -1,0 +1,6 @@
+I need to parse emails that come from: john@example.com and from: jane@example.com
+
+The data comes From: our database, not From: external sources.
+
+This is the actual message content.
+
