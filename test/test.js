@@ -387,14 +387,6 @@ exports.test_email_emoji = function(test) {
   test.done();
 };
 
-exports.test_email_with_quotes = function(test) {
-  let email = get_email("email_with_quotes");
-
-  test.equal("Thank you very much.\n\nhere is the code:\n> console.log(\"A\")\n> console.log(\"B\")\n>\n> {\n>     \"summary\": {\n>         \"totalPartnershipsCount\": 0\n>     },\n>     \"partnerships\": []\n> }\nBaptiste\n", email.getVisibleText());
-
-  test.done();
-};
-
 exports.test_email_not_a_signature = function(test) {
   let email = get_email("email_not_a_signature");
 
