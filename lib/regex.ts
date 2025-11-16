@@ -1,23 +1,33 @@
-let RE2;
-let hasRE2;
+/*
+ * email-reply-parser
+ *
+ * Copyright 2025, Mirage AI
+ * Author: Baptiste Jamin <baptiste@jam.in>
+ */
 
+/**************************************************************************
+ * IMPORTS
+ ***************************************************************************/
+
+// NPM
+import type RE2 from "re2";
+
+/**
+ * RegexList
+ */
 class RegexList {
-  constructor() {
-    // inspiration: https://github.com/spamscanner/url-regex-safe/blob/6c1e2c3b5557709633a2cc971d599469ea395061/src/index.js#L37-L49
-    this.SafeRegExp = hasRE2 !== false
-        ? (() => {
-          if (typeof RE2 === 'function') return RE2;
-          try {
-            RE2 = require('re2');
-            return typeof RE2 === 'function' ? RE2 : RegExp;
-          } catch {
-            hasRE2 = false;
-            return RegExp;
-          }
-        })()
-        : RegExp;
+  RE2: typeof RE2;
+  hasRE2: boolean;
+  quoteHeadersRegex: RegExp[];
+  signatureRegex: RegExp[];
 
-    this.quoteHeadersRegex = this.buildRe2([
+  /**
+   * Constructor
+   */
+  constructor() {
+    this.hasRE2 = this.detectRE2();
+
+    this.quoteHeadersRegex = this.buildSafeRegexes([
       /^-*\s*(On\s.+\s.+\n?wrote:{0,1})\s{0,1}-*$/m, // On DATE, NAME <EMAIL> wrote:
       /^-*\s*(Le\s.+\s.+\n?écrit\s?:{0,1})\s{0,1}-*$/m, // Le DATE, NAME <EMAIL> a écrit :
       /^-*\s*(El\s.+\s.+\n?escribió:{0,1})\s{0,1}-*$/m, // El DATE, NAME <EMAIL> escribió:
@@ -50,7 +60,7 @@ class RegexList {
       /^-{1,12} ?(M|m)essage d\'origine ?-{1,12}$/i
     ]);
 
-    this.signatureRegex = this.buildRe2([
+    this.signatureRegex = this.buildSafeRegexes([
       /^\s*-{2,4}$/, // Separator
       /^\s*_{2,4}$/, // Separator
       /^-- $/, // Separator
@@ -83,19 +93,48 @@ class RegexList {
 
       // ES
       /^Enviado desde (?:\s*.+)$/, // es,
-      
+
       // IT
       /^-*\s*(In\sdata\s.+\s.+\n?scritto:{0,1})\s{0,1}-*$/m, // it,
 
       // NL
       /^Verzonden vanaf (?:\s*.+)$/, // nl - e.g. Verzonden vanaf (Outlook voor Android<https://aka.ms/12345>|mijn iPad)
-      /^Verstuurd vanaf (?:\s*.+)$/, // nl - e.g. Verstuurd vanaf mijn iPad/iPhone
+      /^Verstuurd vanaf (?:\s*.+)$/  // nl - e.g. Verstuurd vanaf mijn iPad/iPhone
     ]);
   }
 
-  buildRe2(regexList) {
-    return regexList.map((regex) => new this.SafeRegExp(regex));
+  /**
+   * Detect RE2
+   */
+  private detectRE2() {
+    try {
+      this.RE2 = require("re2");
+
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Build Re2
+   */
+  private buildSafeRegexes(regexList: RegExp[]) {
+    return regexList.map((regex) => {
+      return this.buildSafeRegExp(regex);
+    });
+  }
+
+  /**
+   * Build Safe RegExp
+   */
+  private buildSafeRegExp(regex: RegExp): RegExp {
+    if (this.hasRE2) {
+      return new this.RE2(regex);
+    } else {
+      return new RegExp(regex);
+    }
   }
 }
 
-module.exports = new RegexList();
+export default new RegexList();

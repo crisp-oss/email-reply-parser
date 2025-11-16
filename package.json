@@ -2,13 +2,16 @@
   "name": "email-reply-parser",
   "version": "2.2.1",
   "description": "Node library for parsing plain text email content. Based on https://github.com/willdurand/EmailReplyParser",
-  "main": "lib/emailreplyparser.js",
+  "main": "dist/emailreplyparser.js",
+  "types": "dist/emailreplyparser.d.ts",
   "homepage": "https://github.com/crisp-oss/email-reply-parser",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git://github.com/crisp-oss/email-reply-parser.git"
   },
   "scripts": {
+    "build": "npx tsc",
     "test": "node ./node_modules/nodeunit/bin/nodeunit test/test.js"
   },
   "engines": {
@@ -17,8 +20,16 @@
   "author": "Crisp IM SAS",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "22.13.10",
+    "@typescript-eslint/eslint-plugin": "8.39.1",
+    "typescript": "5.9.2",
+    "eslint": "9.29.0",
+    "eslint-plugin-crisp": "1.1.13",
+    "eslint-plugin-jsdoc": "54.1.0",
     "nodeunit": "v0.11.3",
     "re2": "1.22.1",
+    "redos-detector": "^6.1.2",
+    "safe-regex": "^2.1.1",
     "underscore": "v1.13.6"
   },
   "peerDependencies": {

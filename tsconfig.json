@@ -1,0 +1,17 @@
+{
+  "include": ["lib/**/*.ts"],
+  "compilerOptions": {
+    "declaration": true,
+    "outDir": "dist/",
+    "module": "ES2020",
+    "target": "es6",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "Node",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["lib/*"]
+    },
+  }
+}
