@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## v2.3.1
+
+Deprecate legacy versions of Node pre Node 20 (not supporting ESM)
+
 ## v2.3.0
 
 - Refactor package using Typescript and eslint.
@@ -111,4 +115,3 @@ Changelog
 - Execute Regexes using Re2.
 - Fix backtracking issues.
 - Move all regexes to a singleton.
-
