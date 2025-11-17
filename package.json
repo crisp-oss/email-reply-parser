@@ -12,7 +12,9 @@
   },
   "scripts": {
     "build": "npx tsc",
-    "test": "node ./node_modules/nodeunit/bin/nodeunit test/test.js"
+    "lint": "eslint .",
+    "unit": "node ./node_modules/nodeunit/bin/nodeunit test/test.js",
+    "test": "npm run unit && npm run lint"
   },
   "engines": {
     "node": ">= 10.0.0"
