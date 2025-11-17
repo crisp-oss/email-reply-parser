@@ -1,9 +1,13 @@
 Changelog
 =========
 
+## v2.3.2
+
+Export all files as ESM.
+
 ## v2.3.1
 
-Deprecate legacy versions of Node pre Node 20 (not supporting ESM)
+Deprecate legacy versions of Node pre Node 20 (not supporting ESM).
 
 ## v2.3.0
 

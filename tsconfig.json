@@ -3,12 +3,12 @@
   "compilerOptions": {
     "declaration": true,
     "outDir": "dist/",
-    "module": "ES2020",
+    "module": "Node16",
     "target": "es6",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "Node16",
     "baseUrl": ".",
     "paths": {
       "@/*": ["lib/*"]

@@ -6,6 +6,12 @@
   "types": "dist/emailreplyparser.d.ts",
   "homepage": "https://github.com/crisp-oss/email-reply-parser",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/emailreplyparser.d.ts",
+      "import": "./dist/emailreplyparser.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/crisp-oss/email-reply-parser.git"
