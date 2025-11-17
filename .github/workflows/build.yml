@@ -25,6 +25,9 @@ jobs:
       - name: Verify versions
         run: node --version && npm --version && node -p process.versions.v8
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Build package
         run: npm run build
 
