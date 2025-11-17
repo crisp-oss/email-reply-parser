@@ -27,42 +27,42 @@ class Fragment {
   }
 
   /**
-   * isHidden
+   * Check if the fragment is hidden
    */
   public isHidden(): boolean {
     return this._isHidden;
   }
 
   /**
-   * isSignature
+   * Check if the fragment is a signature
    */
   public isSignature(): boolean {
     return this._isSignature;
   }
 
   /**
-   * isQuoted
+   * Check if the fragment is quoted
    */
   public isQuoted(): boolean {
     return this._isQuoted;
   }
 
   /**
-   * getContent
+   * Get the content of the fragment
    */
   public getContent(): string {
     return this._content;
   }
 
   /**
-   * isEmpty
+   * Check if the fragment is empty
    */
   isEmpty() {
     return "" === this.getContent().replace(EMPTY_REGEX, "");
   }
 
   /**
-   * toString
+   * Get the string representation of the fragment
    */
   toString(): string {
     return this.getContent();

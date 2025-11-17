@@ -17,21 +17,21 @@ import EmailParser from "./parser/emailparser.js";
  */
 class EmailReplyParser {
   /**
-   * Read
+   * Parse an email
    */
   public read(text: string) {
     return new EmailParser().parse(text);
   }
 
   /**
-   * Parse Reply
+   * Parse a reply
    */
   public parseReply(text: string) {
     return this.read(text).getVisibleText();
   }
 
   /**
-   * Parse Replied
+   * Parse a replied email
    */
   public parseReplied(text: string) {
     return this.read(text).getQuotedText();

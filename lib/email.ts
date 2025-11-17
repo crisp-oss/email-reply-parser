@@ -29,14 +29,14 @@ class Email {
   }
 
   /**
-   * getFragments
+   * Get all fragments for an email
    */
   getFragments(): Fragment[] {
     return this.fragments;
   }
 
   /**
-   * getVisibleText
+   * Get the visible text for an email
    */
   getVisibleText(): string {
     return this.filterText((fragment) => {
@@ -45,7 +45,7 @@ class Email {
   }
 
   /**
-   * getQuotedText
+   * Get the quoted text for an email
    */
   getQuotedText(): string {
     return this.filterText((fragment) => {
@@ -54,9 +54,9 @@ class Email {
   }
 
   /**
-   * filterText
+   * Apply a filter method to the fragments
    */
-  filterText(filter: (fragment: Fragment) => boolean): string {
+  private filterText(filter: (fragment: Fragment) => boolean): string {
     let filteredFragments = this.fragments.filter(filter);
 
     return filteredFragments.join("\n").replace(TILDE_REGEX, "");

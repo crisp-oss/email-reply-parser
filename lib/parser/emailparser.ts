@@ -38,9 +38,9 @@ class EmailParser {
   }
 
   /**
-   * stringReverse
+   * Reverse a string
    */
-  stringReverse(text) {
+  private stringReverse(text: string) {
     let s = "";
     let i = text.length;
 
@@ -53,9 +53,9 @@ class EmailParser {
   }
 
   /**
-   * stringRTrim
+   * Trim a string from the right
    */
-  stringRTrim(text, mask) {
+  private stringRTrim(text: string, mask: string) {
     for (let i = text.length - 1; i >= 0; i--) {
       if (mask !== text.charAt(i)) {
         text = text.substring(0, i + 1);
@@ -68,14 +68,14 @@ class EmailParser {
   }
 
   /**
-   * stringLTrim
+   * Trim a string from the left
    */
-  stringLTrim(text: string) {
+  private stringLTrim(text: string) {
     return text.replace(LEADING_WHITESPACE_REGEX, "");
   }
 
   /**
-   * parse
+   * Parse an email
    */
   parse(text: string) {
     text = text.replace(CRLF_NEWLINE_REGEX, "\n");
@@ -132,7 +132,7 @@ class EmailParser {
   }
 
   /**
-   * fixBrokenSignatures
+   * Fix broken signatures
    */
   fixBrokenSignatures(text: string) {
     let newText = text;
@@ -156,14 +156,14 @@ class EmailParser {
   }
 
   /**
-   * getQuoteHeadersRegex
+   * Get the quote headers regex
    */
   getQuoteHeadersRegex() {
     return RegexList.quoteHeadersRegex;
   }
 
   /**
-   * setQuoteHeadersRegex
+   * Set the quote headers regex
    */
   setQuoteHeadersRegex(quoteHeadersRegex) {
     RegexList.quoteHeadersRegex = quoteHeadersRegex;
@@ -172,7 +172,7 @@ class EmailParser {
   }
 
   /**
-   * createEmail
+   * Create an email
    */
   createEmail(fragmentDTOs: FragmentDTO[]) {
     let fragments = [];
@@ -190,7 +190,7 @@ class EmailParser {
   }
 
   /**
-   * isQuoteHeader
+   * Check if the line is a quote header
    */
   isQuoteHeader(line: string) {
     let hasHeader = false;
@@ -205,7 +205,7 @@ class EmailParser {
   }
 
   /**
-   * isSignature
+   * Check if the line is a signature
    */
   isSignature(line) {
     let text = this.stringReverse(line);
@@ -216,21 +216,21 @@ class EmailParser {
   }
 
   /**
-   * isQuote
+   * Check if the line is a quote
    */
   isQuote(line: string) {
     return QUOTE_REGEX.test(line);
   }
 
   /**
-   * isEmpty
+   * Check if the fragment is empty
    */
   isEmpty(fragment: FragmentDTO) {
     return "" === fragment.lines.join("");
   }
 
   /**
-   * isFragmentLine
+   * Check if the line is a fragment line
    */
   isFragmentLine(fragment: FragmentDTO, line: string, isQuoted: boolean) {
     return fragment.isQuoted === isQuoted ||
@@ -238,7 +238,7 @@ class EmailParser {
   }
 
   /**
-   * addFragment
+   * Add a fragment
    */
   addFragment(fragment: FragmentDTO) {
     if (fragment.isQuoted || fragment.isSignature || this.isEmpty(fragment)) {

@@ -823,3 +823,89 @@ export function test_tricky_html_entities(test) {
   
   test.done();
 }
+
+// Convenience methods tests
+
+export function test_parseReply_extracts_visible_text(test) {
+  var data = fs.readFileSync(__dirname + "/fixtures/email_1.txt", "utf-8");
+  var parser = new EmailReplyParser();
+  
+  var reply = parser.parseReply(data);
+  
+  test.equal("Hi folks\n\nWhat is the best way to clear a Riak bucket of all key, values after\nrunning a test?\nI am currently using the Java HTTP API.\n\n-Abhishek Kona\n\n", reply);
+  
+  test.done();
+}
+
+export function test_parseReply_with_signature(test) {
+  var data = fs.readFileSync(__dirname + "/fixtures/email_sent_from.txt", "utf-8");
+  var parser = new EmailReplyParser();
+  
+  var reply = parser.parseReply(data);
+  
+  test.equal("Hi it can happen to any texts you type, as long as you type in between words or paragraphs.\n", reply);
+  
+  test.done();
+}
+
+export function test_parseReply_with_quote_header(test) {
+  var emailContent = `Hi there,
+
+I appreciate your help with this issue.
+
+Best regards,
+John
+
+On Dec 16, 2024, at 12:47 PM, Support <support@example.com> wrote:
+
+> How can we help you today?
+> 
+> Thanks,
+> Support Team`;
+  
+  var parser = new EmailReplyParser();
+  var reply = parser.parseReply(emailContent);
+  
+  test.equal(true, /Hi there/.test(reply));
+  test.equal(true, /I appreciate your help/.test(reply));
+  test.equal(false, /How can we help you today/.test(reply));
+  test.equal(false, /Support Team/.test(reply));
+  
+  test.done();
+}
+
+export function test_parseReplied_extracts_quoted_text(test) {
+  var emailContent = `Hi there,
+
+I appreciate your help with this issue.
+
+On Dec 16, 2024, at 12:47 PM, Support <support@example.com> wrote:
+
+> How can we help you today?
+> 
+> Thanks,
+> Support Team`;
+  
+  var parser = new EmailReplyParser();
+  var quoted = parser.parseReplied(emailContent);
+  
+  test.equal(true, /How can we help you today/.test(quoted));
+  test.equal(false, /Hi there/.test(quoted));
+  test.equal(false, /I appreciate your help/.test(quoted));
+  
+  test.done();
+}
+
+export function test_parseReplied_with_multiple_quotes(test) {
+  var data = fs.readFileSync(__dirname + "/fixtures/email_2.txt", "utf-8");
+  var parser = new EmailReplyParser();
+  
+  var quoted = parser.parseReplied(data);
+  
+  // Should contain quoted content from the original message
+  test.equal(true, quoted.length > 0);
+  test.equal(true, /Hi folks/.test(quoted));
+  test.equal(true, /riak-users mailing list/.test(quoted));
+  
+  test.done();
+}

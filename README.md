@@ -57,9 +57,9 @@ This library is used at [Crisp](https://crisp.chat/) everyday with around 1 mill
 ## Usage
 
 ``` javascript
-var EmailReplyParser = require("email-reply-parser");
+import EmailReplyParser from "email-reply-parser";
 
-var email =  new EmailReplyParser().read(MY_EMAIL_STRING);
+const email = new EmailReplyParser().read(MY_EMAIL_STRING);
 
 console.log(email.getVisibleText());
 ```
@@ -67,9 +67,9 @@ console.log(email.getVisibleText());
 ### Example
 
 ``` javascript
-var EmailReplyParser = require("email-reply-parser");
+import EmailReplyParser from "email-reply-parser";
 
-var emailContent = `Hi there,
+const emailContent = `Hi there,
 
 I appreciate your help with this issue.
 
@@ -83,9 +83,9 @@ On Dec 16, 2024, at 12:47 PM, Support <support@example.com> wrote:
 > Thanks,
 > Support Team`;
 
-var email = new EmailReplyParser().read(emailContent);
+const parser = new EmailReplyParser();
 
-console.log(email.getVisibleText());
+console.log(parser.parseReply(emailContent));
 // Output: "Hi there,\n\nI appreciate your help with this issue."
 ```
 
