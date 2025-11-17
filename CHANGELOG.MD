@@ -1,7 +1,7 @@
 Changelog
 =========
 
-## v2.3.2
+## v2.3.3
 
 Export all files as ESM.
 
