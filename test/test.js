@@ -288,6 +288,16 @@ export function test_email_german_3(test) {
   test.done();
 };
 
+export function test_email_german_outlook(test) {
+  let email = get_email("email_german_outlook");
+
+  let fragments = email.getFragments();
+
+  test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+
+  test.done();
+};
+
 export function test_email_gmail_no(test) {
   let email = get_email("email_norwegian_gmail");
 
