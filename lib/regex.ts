@@ -60,7 +60,8 @@ class RegexList {
       /^(.*)[0-9]{4}(.*)from(.*)<(.*)>:$/,
       /^-{1,12} ?(O|o)riginal (M|m)essage ?-{1,12}$/i,
       /^-{1,12} ?(O|o)prindelig (B|b)esked ?-{1,12}$/i,
-      /^-{1,12} ?(M|m)essage d\'origine ?-{1,12}$/i
+      /^-{1,12} ?(M|m)essage d\'origine ?-{1,12}$/i,
+      /^-{1,12} ?(U|u)rsprüngliche (N|n)achricht ?-{0,12}$/i
     ]);
 
     this.signatureRegex = this.buildSafeRegexes([
