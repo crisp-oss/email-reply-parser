@@ -1,13 +1,17 @@
 Changelog
 =========
 
+## v2.3.4
+
+- New regex added by @ThriceGood to support Outlook answers in German.
+
 ## v2.3.3
 
-Export all files as ESM.
+- Export all files as ESM.
 
 ## v2.3.1
 
-Deprecate legacy versions of Node pre Node 20 (not supporting ESM).
+- Deprecate legacy versions of Node pre Node 20 (not supporting ESM).
 
 ## v2.3.0
 
