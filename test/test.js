@@ -456,6 +456,17 @@ export function test_email_gmail(test) {
   test.done();
 }
 
+export function test_email_gmail_split_line_german(test) {
+  let email = get_email("email_gmail_split_line_from_german");
+
+  let fragments = email.getFragments();
+
+  test.equal(COMMON_FIRST_FRAGMENT, fragments[0].toString().trim());
+  test.equal(2, fragments.length);
+
+  test.done();
+}
+
 export function text_email_reply_header(test) {
   let email = get_email("email_reply_header");
 
