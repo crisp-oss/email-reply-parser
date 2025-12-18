@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## v2.3.5
+
+- Fix error with require.
+
 ## v2.3.4
 
 - New regex added by @ThriceGood to support Outlook answers in German.
