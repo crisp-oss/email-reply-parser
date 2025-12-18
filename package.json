@@ -9,7 +9,8 @@
   "exports": {
     ".": {
       "types": "./dist/emailreplyparser.d.ts",
-      "import": "./dist/emailreplyparser.js"
+      "import": "./dist/emailreplyparser.js",
+      "require": "./dist/emailreplyparser.js"
     }
   },
   "repository": {
