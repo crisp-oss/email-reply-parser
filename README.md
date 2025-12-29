@@ -13,9 +13,11 @@ This library supports most email replies, signatures and locales.
 <table>
 <tr>
 <td align="center"><a href="https://crisp.chat/"><img src="https://crisp.chat/favicons/favicon-256x256.png" height="64" /></a></td>
+<td align="center"><a href="https://hosttools.com/"><img src="https://app.hosttools.com/favicon.ico" height="64" /></a></td>
 </tr>
 <tr>
 <td align="center">Crisp</td>
+<td align="center">Host Tools</td>
 </tr>
 </table>
 
