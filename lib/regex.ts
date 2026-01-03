@@ -34,14 +34,13 @@ class RegexList {
       /^-*\s*(On\s.+\s.+\n?wrote:{0,1})\s{0,1}-*$/m, // On DATE, NAME <EMAIL> wrote:
       /^-*\s*(Le\s.+\s.+\n?écrit\s?:{0,1})\s{0,1}-*$/m, // Le DATE, NAME <EMAIL> a écrit :
       /^-*\s*(El\s.+\s.+\n?escribió:{0,1})\s{0,1}-*$/m, // El DATE, NAME <EMAIL> escribió:
-      /^-*\s*(Il\s.+\s.+\n?scritto:{0,1})\s{0,1}-*$/m,  // Il DATE, NAME <EMAIL> ha scritto:
-      /^-*\s*(Em\s.+\s.+\n?escreveu:{0,1})\s{0,1}-*$/m,  // Em DATE, NAME <EMAIL> ha escreveu:
-      /^\s*(Am\s.+\s)\n?\n?schrieb.+\s?(\[|<).+(\]|>):$/m, // Am DATE schrieb NAME <EMAIL>:
+      /^-*\s*(Il\s.+\s.+\n?scritto:{0,1})\s{0,1}-*$/m, // Il DATE, NAME <EMAIL> ha scritto:
+      /^-*\s*(Em\s.+\s.+\n?escreveu:{0,1})\s{0,1}-*$/m, // Em DATE, NAME <EMAIL> ha escreveu:
       /^\s*(Op\s[\s\S]+?\n?schreef[\s\S]+:)$/m, // Il DATE, schreef NAME <EMAIL>:
       /^\s*((W\sdniu|Dnia)\s[\s\S]+?(pisze|napisał(\(a\))?):)$/mu, // W dniu DATE, NAME <EMAIL> pisze|napisał:
       /^\s*(Den\s.+\s\n?skrev\s.+:)$/m, // Den DATE skrev NAME <EMAIL>:
       /^\s*(pe\s.+\s.+\n?kirjoitti:)$/m, // pe DATE NAME <EMAIL> kirjoitti:
-      /^\s*(Am\s.+\sum\s.+\s\n?schrieb\s.+:)$/m, // Am DATE um TIME schrieb NAME:
+      /^\s*(Am\s.+\s\n?\n?schrieb.+\s?((\[|<)\n?.+(\]|>))?):$/m, // Am DATE schrieb NAME <EMAIL>: OR Am DATE um TIME schrieb NAME <EMAIL>: (with optional newline after <)
       /^\s*(ср\,\s.+\n? г\. в\s.+,\s.+[\[|<].+[\]|>]:)$/m, // ср, DATE г. в TIME, NAME <EMAIL>:
       /^(在[\s\S]+写道：)$/m, // > 在 DATE, TIME, NAME 写道：
       /^(20[0-9]{2}\..+\s작성:)$/m, // DATE TIME NAME 작성:
