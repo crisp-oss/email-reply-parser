@@ -36,13 +36,13 @@
     "eslint-plugin-crisp": "1.1.13",
     "eslint-plugin-jsdoc": "54.1.0",
     "nodeunit": "v0.11.3",
-    "re2": "1.22.1",
+    "re2": "^1.24.0",
     "redos-detector": "^6.1.2",
     "safe-regex": "^2.1.1",
     "underscore": "v1.13.6"
   },
   "peerDependencies": {
-    "re2": "1.22.1"
+    "re2": "^1.24.0"
   },
   "peerDependenciesMeta": {
     "re2": {
