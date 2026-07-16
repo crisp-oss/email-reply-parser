@@ -59,9 +59,8 @@ class Email {
   /**
    * Apply a filter method to the fragments
    */
-  // eslint-disable-next-line no-unused-vars
   private filterText(filter: (fragment: Fragment) => boolean): string {
-    let filteredFragments = this.fragments.filter(filter);
+    const filteredFragments = this.fragments.filter(filter);
 
     return filteredFragments.join("\n").replace(TILDE_REGEX, "");
   }

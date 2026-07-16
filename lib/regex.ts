@@ -30,6 +30,7 @@ class RegexList {
   constructor() {
     this.hasRE2 = this.detectRE2();
 
+    /* eslint-disable max-len */
     this.quoteHeadersRegex = this.buildSafeRegexes([
       /^-*\s*(On\s.+\s.+\n?wrote:{0,1})\s{0,1}-*$/m, // On DATE, NAME <EMAIL> wrote:
       /^-*\s*(Le\s.+\s.+\n?écrit\s?:{0,1})\s{0,1}-*$/m, // Le DATE, NAME <EMAIL> a écrit :
@@ -105,6 +106,7 @@ class RegexList {
       /^Verzonden vanaf (?:\s*.+)$/, // nl - e.g. Verzonden vanaf (Outlook voor Android<https://aka.ms/12345>|mijn iPad)
       /^Verstuurd vanaf (?:\s*.+)$/  // nl - e.g. Verstuurd vanaf mijn iPad/iPhone
     ]);
+    /* eslint-enable max-len */
   }
 
   /**

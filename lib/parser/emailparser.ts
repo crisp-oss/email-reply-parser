@@ -96,7 +96,7 @@ class EmailParser {
       }
 
       if (fragment) {
-        let last = fragment.lines[fragment.lines.length - 1];
+        const last = fragment.lines[fragment.lines.length - 1];
 
         if (this.isSignature(last)) {
           fragment.isSignature = true;
@@ -109,7 +109,7 @@ class EmailParser {
         }
       }
 
-      let isQuoted = this.isQuote(line);
+      const isQuoted = this.isQuote(line);
 
       if (fragment === null || !this.isFragmentLine(fragment, line, isQuoted)) {
         if (fragment !== null) {
@@ -127,7 +127,7 @@ class EmailParser {
       this.addFragment(fragment);
     }
 
-    let email = this.createEmail(this.fragments);
+    const email = this.createEmail(this.fragments);
 
     this.fragments = [];
 
@@ -143,7 +143,7 @@ class EmailParser {
     // For any other quote header lines, if we find one of them,
     //  remove any new lines that happen to match in the first capture group
     RegexList.quoteHeadersRegex.forEach((regex) => {
-      let matches = newText.match(regex);
+      const matches = newText.match(regex);
 
       if (matches) {
         const [
@@ -178,7 +178,7 @@ class EmailParser {
    * Create an email
    */
   createEmail(fragmentDTOs: FragmentDTO[]) {
-    let fragments = [];
+    const fragments = [];
 
     fragmentDTOs.reverse().forEach((fragment) => {
       fragments.push(new Fragment(
@@ -211,7 +211,7 @@ class EmailParser {
    * Check if the line is a signature
    */
   isSignature(line) {
-    let text = this.stringReverse(line);
+    const text = this.stringReverse(line);
 
     return RegexList.signatureRegex.some((regex) => {
       return regex.test(text);

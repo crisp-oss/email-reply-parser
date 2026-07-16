@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## v2.3.6
+
+- Use standard Crisp linter
+
 ## v2.3.5
 
 - Fix error with require.
