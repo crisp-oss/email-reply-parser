@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## v2.3.9
+
+- Pin re2 peer dependency to 1.x.
+
 ## v2.3.8
 
 - Drop Node 20 support (incompatible with re2 native build).

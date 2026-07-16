@@ -1,6 +1,6 @@
 {
   "name": "email-reply-parser",
-  "version": "2.3.8",
+  "version": "2.3.9",
   "description": "Node library for parsing plain text email content. Based on https://github.com/willdurand/EmailReplyParser",
   "main": "dist/emailreplyparser.js",
   "types": "dist/emailreplyparser.d.ts",
@@ -39,7 +39,7 @@
     "re2": "1.26.0"
   },
   "peerDependencies": {
-    "re2": "1.26.0"
+    "re2": "1.x"
   },
   "peerDependenciesMeta": {
     "re2": {
