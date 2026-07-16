@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## v2.3.7
+
+- Remove underscore dependency from tests.
+
 ## v2.3.6
 
 - Use standard Crisp linter
