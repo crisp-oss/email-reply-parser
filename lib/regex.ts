@@ -1,8 +1,8 @@
 /*
- * email-reply-parser
+ * This file is part of email-reply-parser
  *
- * Copyright 2025, Mirage AI
- * Author: Baptiste Jamin <baptiste@jam.in>
+ * Copyright (c) 2025 Crisp IM SAS
+ * All rights belong to Crisp IM SAS
  */
 
 /**************************************************************************

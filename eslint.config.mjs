@@ -1,8 +1,8 @@
 /*
- * This file is part of node-mirage-api
+ * This file is part of email-reply-parser
  *
- * Copyright (c) 2025 Mirage AI
- * All rights belong to Mirage AI
+ * Copyright (c) 2025 Crisp IM SAS
+ * All rights belong to Crisp IM SAS
  */
 
 /**************************************************************************
