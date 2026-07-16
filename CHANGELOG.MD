@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## v2.3.8
+
+- Drop Node 20 support (incompatible with re2 native build).
+
 ## v2.3.7
 
 - Remove underscore dependency from tests.
