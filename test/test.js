@@ -1,5 +1,4 @@
 import fs from "fs";
-import _ from "underscore";
 import EmailReplyParser from "../dist/emailreplyparser.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -24,8 +23,8 @@ export function test_reads_simple_body(test){
 
   test.equal(2, reply.fragments.length);
 
-  test.deepEqual([false, false], _.map(reply.fragments, function(f) { return f.isQuoted(); }));
-  test.deepEqual([false, true], _.map(reply.fragments, function(f) { return f.isHidden(); }));
+  test.deepEqual([false, false], reply.fragments.map(function(f) { return f.isQuoted(); }));
+  test.deepEqual([false, true], reply.fragments.map(function(f) { return f.isHidden(); }));
 
    test.equal("Hi folks\n\nWhat is the best way to clear a Riak bucket of all key, values after\nrunning a test?\nI am currently using the Java HTTP API.\n\n-Abhishek Kona\n\n", reply.fragments[0].toString());
 

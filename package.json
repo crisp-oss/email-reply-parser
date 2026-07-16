@@ -1,6 +1,6 @@
 {
   "name": "email-reply-parser",
-  "version": "2.3.6",
+  "version": "2.3.7",
   "description": "Node library for parsing plain text email content. Based on https://github.com/willdurand/EmailReplyParser",
   "main": "dist/emailreplyparser.js",
   "types": "dist/emailreplyparser.d.ts",
@@ -36,13 +36,10 @@
     "eslint-plugin-crisp": "1.4.12",
     "eslint-plugin-jsdoc": "54.1.0",
     "nodeunit": "v0.11.3",
-    "re2": "1.22.1",
-    "redos-detector": "^6.1.2",
-    "safe-regex": "^2.1.1",
-    "underscore": "v1.13.6"
+    "re2": "1.26.0"
   },
   "peerDependencies": {
-    "re2": "1.22.1"
+    "re2": "1.26.0"
   },
   "peerDependenciesMeta": {
     "re2": {
