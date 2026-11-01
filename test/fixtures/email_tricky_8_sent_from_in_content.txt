@@ -1,0 +1,6 @@
+The notification was sent from my iPhone app to all users.
+
+This email was sent from our automated system, not Sent from my iPad.
+
+All messages are sent from the main server.
+

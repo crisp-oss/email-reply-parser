@@ -1,0 +1,255 @@
+/*
+ * This file is part of email-reply-parser
+ *
+ * Copyright (c) 2025 Crisp IM SAS
+ * All rights belong to Crisp IM SAS
+ */
+
+/**************************************************************************
+ * IMPORTS
+ ***************************************************************************/
+
+// PROJECT: PARSER
+import FragmentDTO from "./fragmentdto.js";
+
+// NPM
+import Fragment from "../fragment.js";
+import Email from "../email.js";
+import RegexList from "../regex.js";
+
+/**************************************************************************
+ * INSTANCES
+ ***************************************************************************/
+
+const QUOTE_REGEX = /(>+)$/;
+const LEADING_WHITESPACE_REGEX = /^\s+/;
+const LEADING_NEWLINE_REGEX = /^\n/g;
+const CRLF_NEWLINE_REGEX = /\r\n/g;
+const NEWLINE_REGEX = /\n/g;
+
+/**
+ * EmailParser
+ */
+class EmailParser {
+  private fragments: FragmentDTO[];
+
+  /**
+   * Constructor
+   */
+  constructor() {
+    this.fragments = [];
+  }
+
+  /**
+   * Reverse a string
+   */
+  private stringReverse(text: string) {
+    let s = "";
+    let i = text.length;
+
+    while (i > 0) {
+      s += text.substring(i - 1, i);
+      i--;
+    }
+
+    return s;
+  }
+
+  /**
+   * Trim a string from the right
+   */
+  private stringRTrim(text: string, mask: string) {
+    for (let i = text.length - 1; i >= 0; i--) {
+      if (mask !== text.charAt(i)) {
+        text = text.substring(0, i + 1);
+
+        break;
+      }
+    }
+
+    return text;
+  }
+
+  /**
+   * Trim a string from the left
+   */
+  private stringLTrim(text: string) {
+    return text.replace(LEADING_WHITESPACE_REGEX, "");
+  }
+
+  /**
+   * Parse an email
+   */
+  parse(text: string) {
+    text = text.replace(CRLF_NEWLINE_REGEX, "\n");
+    text = this.fixBrokenSignatures(text);
+
+    let fragment = null;
+
+    const lines = this.stringReverse(text).split("\n");
+
+    lines.forEach((line) => {
+      line = this.stringRTrim(line, "\n");
+
+      if (!this.isSignature(line)) {
+        line = this.stringLTrim(line);
+      }
+
+      if (fragment) {
+        const last = fragment.lines[fragment.lines.length - 1];
+
+        if (this.isSignature(last)) {
+          fragment.isSignature = true;
+          this.addFragment(fragment);
+          fragment = null;
+        } else if (line === "" && this.isQuoteHeader(last)) {
+          fragment.isQuoted = true;
+          this.addFragment(fragment);
+          fragment = null;
+        }
+      }
+
+      const isQuoted = this.isQuote(line);
+
+      if (fragment === null || !this.isFragmentLine(fragment, line, isQuoted)) {
+        if (fragment !== null) {
+          this.addFragment(fragment);
+        }
+
+        fragment = new FragmentDTO();
+        fragment.isQuoted = isQuoted;
+      }
+
+      fragment.lines.push(line);
+    });
+
+    if (fragment !== null) {
+      this.addFragment(fragment);
+    }
+
+    const email = this.createEmail(this.fragments);
+
+    this.fragments = [];
+
+    return email;
+  }
+
+  /**
+   * Fix broken signatures
+   */
+  fixBrokenSignatures(text: string) {
+    let newText = text;
+
+    // For any other quote header lines, if we find one of them,
+    //  remove any new lines that happen to match in the first capture group
+    RegexList.quoteHeadersRegex.forEach((regex) => {
+      const matches = newText.match(regex);
+
+      if (matches) {
+        const [
+          ,
+          matchGroup
+        ] = matches;
+
+        newText = newText.replace(matchGroup, matchGroup.replace(NEWLINE_REGEX, " "));
+      }
+    });
+
+    return newText;
+  }
+
+  /**
+   * Get the quote headers regex
+   */
+  getQuoteHeadersRegex() {
+    return RegexList.quoteHeadersRegex;
+  }
+
+  /**
+   * Set the quote headers regex
+   */
+  setQuoteHeadersRegex(quoteHeadersRegex) {
+    RegexList.quoteHeadersRegex = quoteHeadersRegex;
+
+    return this;
+  }
+
+  /**
+   * Create an email
+   */
+  createEmail(fragmentDTOs: FragmentDTO[]) {
+    const fragments = [];
+
+    fragmentDTOs.reverse().forEach((fragment) => {
+      fragments.push(new Fragment(
+        this.stringReverse(fragment.lines.join("\n")).replace(LEADING_NEWLINE_REGEX, ""),
+        fragment.isHidden,
+        fragment.isSignature,
+        fragment.isQuoted
+      ));
+    });
+
+    return new Email(fragments);
+  }
+
+  /**
+   * Check if the line is a quote header
+   */
+  isQuoteHeader(line: string) {
+    let hasHeader = false;
+
+    RegexList.quoteHeadersRegex.forEach((regex) => {
+      if (regex.test(this.stringReverse(line))) {
+        hasHeader = true;
+      }
+    });
+
+    return hasHeader;
+  }
+
+  /**
+   * Check if the line is a signature
+   */
+  isSignature(line) {
+    const text = this.stringReverse(line);
+
+    return RegexList.signatureRegex.some((regex) => {
+      return regex.test(text);
+    });
+  }
+
+  /**
+   * Check if the line is a quote
+   */
+  isQuote(line: string) {
+    return QUOTE_REGEX.test(line);
+  }
+
+  /**
+   * Check if the fragment is empty
+   */
+  isEmpty(fragment: FragmentDTO) {
+    return "" === fragment.lines.join("");
+  }
+
+  /**
+   * Check if the line is a fragment line
+   */
+  isFragmentLine(fragment: FragmentDTO, line: string, isQuoted: boolean) {
+    return fragment.isQuoted === isQuoted ||
+      (fragment.isQuoted && (this.isQuoteHeader(line) || line === ""));
+  }
+
+  /**
+   * Add a fragment
+   */
+  addFragment(fragment: FragmentDTO) {
+    if (fragment.isQuoted || fragment.isSignature || this.isEmpty(fragment)) {
+      fragment.isHidden = true;
+    }
+
+    this.fragments.push(fragment);
+  }
+}
+
+export default EmailParser;

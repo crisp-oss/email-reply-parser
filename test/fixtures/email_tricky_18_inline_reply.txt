@@ -1,0 +1,13 @@
+On Dec 15, 2024, at 2:00 PM, Jane Doe <jane@example.com> wrote:
+> What's your opinion on option A?
+
+I think option A is great.
+
+> What about option B?
+
+Option B has some drawbacks.
+
+> Should we go with option C?
+
+Option C is not suitable for our use case.
+

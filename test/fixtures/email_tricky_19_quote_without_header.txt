@@ -1,0 +1,13 @@
+I wanted to respond to your points:
+
+> This is a quoted section
+> without a proper quote header
+> just angle brackets
+
+My response to the quoted text above.
+
+> Another quoted section
+> in the middle of the email
+
+And my final thoughts.
+

@@ -1,0 +1,13 @@
+Here's the code that's causing issues:
+
+```
+function sendEmail() {
+  // Sent from my custom mailer
+  return mailer.send({
+    signature: '--\nJohn Doe'
+  });
+}
+```
+
+Notice how the code contains signature-like patterns that shouldn't be detected as actual signatures.
+

@@ -1,0 +1,9 @@
+Hi there,
+
+Check out this article about email parsing: https://example.com/blog/on-date-someone-wrote-about-parsing
+
+It's really interesting how they handled the case where URLs contain patterns like "wrote:" in them.
+
+Best regards,
+John
+

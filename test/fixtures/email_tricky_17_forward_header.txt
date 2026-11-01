@@ -1,0 +1,10 @@
+See the forwarded message below.
+
+---------- Forwarded message ---------
+From: John Smith <john@example.com>
+Date: Mon, Dec 15, 2024 at 3:00 PM
+Subject: Important update
+To: Team <team@example.com>
+
+This is the forwarded content that should be treated as quoted text.
+
