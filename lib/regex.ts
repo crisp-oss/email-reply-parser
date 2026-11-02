@@ -11,8 +11,6 @@
 
 // NPM
 import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-
 import type RE2 from "re2";
 
 /**
@@ -114,6 +112,8 @@ class RegexList {
    */
   private detectRE2() {
     try {
+      const require = createRequire(import.meta.url);
+
       this.RE2 = require("re2");
 
       return true;
