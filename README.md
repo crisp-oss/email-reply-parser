@@ -91,6 +91,26 @@ console.log(parser.parseReply(emailContent));
 // Output: "Hi there,\n\nI appreciate your help with this issue."
 ```
 
+### Parse Options
+
+`read`, `parseReply`, and `parseReplied` accept an optional second argument:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `excludeSignatureSeparators` | `boolean` | `false` | Ignore visual separator lines (`--`, `__`, `==`, `++`, etc.) when detecting signatures. Language-specific signatures like "Sent from my iPhone" are still detected. |
+
+``` javascript
+const parser = new EmailReplyParser();
+
+// Default: "--" line triggers signature detection
+parser.parseReply("Hello\n\n--\nJohn");
+// => "Hello\n"
+
+// With option: "--" line is kept as visible content
+parser.parseReply("Hello\n\n--\nJohn", { excludeSignatureSeparators: true });
+// => "Hello\n\n--\nJohn"
+```
+
 ## Contributing
 
 Feel free to fork this project and submit fixes. We may adapt your code to fit the codebase.

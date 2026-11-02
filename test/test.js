@@ -12,10 +12,10 @@ Nam vel turpis posuere, rhoncus ligula in, venenatis orci. Duis interdum venenat
 Duis ut libero eu lectus consequat consequat ut vel lorem. Vestibulum convallis lectus urna,\n\
 et mollis ligula rutrum quis. Fusce sed odio id arcu varius aliquet nec nec nibh.';
 
-function get_email(name) {
+function get_email(name, parseOptions) {
   var data = fs.readFileSync(__dirname + "/fixtures/" + name + ".txt", "utf-8");
 
-  return new EmailReplyParser().read(data);
+  return new EmailReplyParser().read(data, parseOptions);
 }
 
 export function test_reads_simple_body(test){
@@ -916,5 +916,58 @@ export function test_parseReplied_with_multiple_quotes(test) {
   test.equal(true, /Hi folks/.test(quoted));
   test.equal(true, /riak-users mailing list/.test(quoted));
   
+  test.done();
+}
+
+export function test_excludeSignatureSeparators_keeps_separator_visible(test) {
+  let opts = { excludeSignatureSeparators: true };
+
+  // correct_sig has "--" separator — should NOT be a signature with option
+  let email = get_email("correct_sig", opts);
+  let fragments = email.getFragments();
+
+  test.equal(1, fragments.length);
+  test.equal(false, fragments[0].isSignature());
+  test.equal(true, /correct -- signature/.test(fragments[0].toString()));
+  test.equal(true, /rick/.test(fragments[0].toString()));
+
+  test.done();
+}
+
+export function test_excludeSignatureSeparators_default_unchanged(test) {
+  // Without option, correct_sig should still detect signature as before
+  let email = get_email("correct_sig");
+  let fragments = email.getFragments();
+
+  test.equal(2, fragments.length);
+  test.equal(false, fragments[0].isSignature());
+  test.equal(true, fragments[1].isSignature());
+
+  test.done();
+}
+
+export function test_excludeSignatureSeparators_still_detects_phrase_signatures(test) {
+  let email = get_email("email_sent_from", { excludeSignatureSeparators: true });
+  let fragments = email.getFragments();
+
+  // "Sent from" should still be detected as signature
+  test.equal(true, fragments.some(f => f.isSignature()));
+
+  test.done();
+}
+
+export function test_parseReply_with_excludeSignatureSeparators(test) {
+  var data = "Hello world\n\n--\nJohn Doe";
+  var parser = new EmailReplyParser();
+
+  var defaultReply = parser.parseReply(data);
+  var optionReply = parser.parseReply(data, { excludeSignatureSeparators: true });
+
+  // Default: separator triggers signature, only "Hello world" visible
+  test.equal("Hello world\n", defaultReply);
+
+  // With option: separator not a signature, entire email visible
+  test.equal("Hello world\n\n--\nJohn Doe", optionReply);
+
   test.done();
 }

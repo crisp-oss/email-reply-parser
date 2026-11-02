@@ -27,17 +27,23 @@ const LEADING_NEWLINE_REGEX = /^\n/g;
 const CRLF_NEWLINE_REGEX = /\r\n/g;
 const NEWLINE_REGEX = /\n/g;
 
+export interface ParseOptions {
+  excludeSignatureSeparators?: boolean;
+}
+
 /**
  * EmailParser
  */
 class EmailParser {
   private fragments: FragmentDTO[];
+  private options: ParseOptions;
 
   /**
    * Constructor
    */
   constructor() {
     this.fragments = [];
+    this.options = {};
   }
 
   /**
@@ -80,7 +86,8 @@ class EmailParser {
   /**
    * Parse an email
    */
-  parse(text: string) {
+  parse(text: string, options?: ParseOptions) {
+    this.options = options || {};
     text = text.replace(CRLF_NEWLINE_REGEX, "\n");
     text = this.fixBrokenSignatures(text);
 
@@ -213,7 +220,11 @@ class EmailParser {
   isSignature(line) {
     const text = this.stringReverse(line);
 
-    return RegexList.signatureRegex.some((regex) => {
+    let regexes = this.options.excludeSignatureSeparators
+      ? RegexList.signatureRegex
+      : [...RegexList.separatorSignatureRegex, ...RegexList.signatureRegex];
+
+    return regexes.some((regex) => {
       return regex.test(text);
     });
   }

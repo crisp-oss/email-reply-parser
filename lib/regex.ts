@@ -22,6 +22,7 @@ class RegexList {
   RE2: typeof RE2;
   hasRE2: boolean;
   quoteHeadersRegex: RegExp[];
+  separatorSignatureRegex: RegExp[];
   signatureRegex: RegExp[];
 
   /**
@@ -65,14 +66,16 @@ class RegexList {
       /^-{1,12} ?(U|u)rsprüngliche (N|n)achricht ?-{0,12}$/i
     ]);
 
-    this.signatureRegex = this.buildSafeRegexes([
+    this.separatorSignatureRegex = this.buildSafeRegexes([
       /^\s*-{2,4}$/, // Separator
       /^\s*_{2,4}$/, // Separator
       /^-- $/, // Separator
       /^\+{2,4}$/, // Separator
       /^\={2,4}$/, // Separator
-      /^________________________________$/, // Separator
+      /^________________________________$/ // Separator
+    ]);
 
+    this.signatureRegex = this.buildSafeRegexes([
       // EN
       /^Sent from (?:\s*.+)$/, // en
       /^Get Outlook for (?:\s*.+).*/m, // en
