@@ -43,7 +43,7 @@ class RegexList {
       /^\s*(Den\s.+\s\n?skrev\s.+:)$/m, // Den DATE skrev NAME <EMAIL>:
       /^\s*(pe\s.+\s.+\n?kirjoitti:)$/m, // pe DATE NAME <EMAIL> kirjoitti:
       /^\s*(Am\s.+\sum\s.+\s\n?schrieb\s.+:)$/m, // Am DATE um TIME schrieb NAME:
-      /^\s*(ср\,\s.+\n? г\. в\s.+,\s.+[\[|<].+[\]|>]:)$/m, // ср, DATE г. в TIME, NAME <EMAIL>:
+      /^\s*((?:пн|вт|ср|чт|пт|сб|вс)\,\s.+\n? г\. в\s.+,\s.*[\[|<].+[\]|>]:)$/m, // DAY, DATE г. в TIME, NAME <EMAIL>:
       /^(在[\s\S]+写道：)$/m, // > 在 DATE, TIME, NAME 写道：
       /^(20[0-9]{2}\..+\s작성:)$/m, // DATE TIME NAME 작성:
       /^(20[0-9]{2}\/.+のメッセージ:)$/m, // DATE TIME、NAME のメッセージ:
