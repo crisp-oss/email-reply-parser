@@ -337,6 +337,22 @@ export function test_email_russian(test) {
   test.done();
 };
 
+export function test_email_russian_gmail_weekdays(test) {
+  const weekdays = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
+  const senders = ["John Doe <doe@example.com>", "<doe@example.com>"];
+
+  for (const weekday of weekdays) {
+    for (const sender of senders) {
+      const header = `${weekday}, 5 нояб. 2026\u202fг. в 10:25, ${sender}:`;
+      const email = new EmailReplyParser().read(`Ответ\n\n${header}\n\n> Старое сообщение`);
+
+      test.equal(email.getVisibleText().trim(), "Ответ", header);
+    }
+  }
+
+  test.done();
+};
+
 export function test_email_with_correct_signature(test) {
   let email = get_email("correct_sig");
 
