@@ -39,7 +39,7 @@ class RegexList {
       /^\s*((W\sdniu|Dnia)\s[\s\S]+?(pisze|napisał(\(a\))?):)$/mu, // W dniu DATE, NAME <EMAIL> pisze|napisał:
       /^\s*(Den\s.+\s\n?skrev\s.+:)$/m, // Den DATE skrev NAME <EMAIL>:
       /^\s*(pe\s.+\s.+\n?kirjoitti:)$/m, // pe DATE NAME <EMAIL> kirjoitti:
-      /^\s*(Am\s.+\s\n?\n?schrieb.+\s?((\[|<)\n?.+(\]|>))?):$/m, // Am DATE schrieb NAME <EMAIL>: OR Am DATE um TIME schrieb NAME <EMAIL>: (with optional newline after <)
+      /^\s*(Am\s.+\s\n?\n?schrieb\s.+\s?((\[|<)\n?.+(\]|>))?):$/m, // Am DATE schrieb NAME <EMAIL>: OR Am DATE um TIME schrieb NAME <EMAIL>: (with optional newline after <)
       /^\s*(ср\,\s.+\n? г\. в\s.+,\s.+[\[|<].+[\]|>]:)$/m, // ср, DATE г. в TIME, NAME <EMAIL>:
       /^(在[\s\S]+写道：)$/m, // > 在 DATE, TIME, NAME 写道：
       /^(20[0-9]{2}\..+\s작성:)$/m, // DATE TIME NAME 작성:

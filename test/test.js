@@ -466,6 +466,25 @@ export function test_email_gmail_split_line_german(test) {
   test.done();
 }
 
+export function test_email_german_header_variants(test) {
+  const parser = new EmailReplyParser();
+
+  const headers = [
+    "Am Fr., 28. Nov. 2025 um 15:57 Uhr schrieb Test Mailer <testing@testing.com>:", // With Uhr and email
+    "Am Fr., 28. Nov. 2025 um 15:57 Uhr schrieb Test Mailer <\ntesting@testing.com>:", // Newline after <
+    "Am Fr., 28. Nov. 2025 um 15:57 schrieb Test Mailer:", // No Uhr, no email
+    "Am Fr., 28. Nov. 2025 schrieb Test Mailer <testing@testing.com>:" // No time
+  ];
+
+  headers.forEach((header) => {
+    const reply = parser.parseReply("Blah blah blah.\n\n" + header + "\n\n> Test");
+
+    test.equal("Blah blah blah.", reply.trim(), JSON.stringify(header));
+  });
+
+  test.done();
+}
+
 export function text_email_reply_header(test) {
   let email = get_email("email_reply_header");
 
