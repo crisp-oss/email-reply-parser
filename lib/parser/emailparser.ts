@@ -21,7 +21,6 @@ import RegexList from "../regex.js";
  * INSTANCES
  ***************************************************************************/
 
-const QUOTE_REGEX = /(>+)$/;
 const LEADING_WHITESPACE_REGEX = /^\s+/;
 const LEADING_NEWLINE_REGEX = /^\n/g;
 const CRLF_NEWLINE_REGEX = /\r\n/g;
@@ -222,7 +221,7 @@ class EmailParser {
    * Check if the line is a quote
    */
   isQuote(line: string) {
-    return QUOTE_REGEX.test(line);
+    return line.endsWith(">");
   }
 
   /**
