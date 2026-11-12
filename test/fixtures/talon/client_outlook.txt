@@ -1,0 +1,27 @@
+Hello
+
+From: xxx@xxx.mailgun.org [mailto:xxx@xxx.mailgun.org]
+Sent: March-09-12 4:22 PM
+To: Dan Le
+Subject: The manager has commented on your Loop
+
+Hi dan.le@example.com<mailto:dan.le@example.com>,
+
+The manager's comment:
+"Hello Allan! Did you ask for some MIME? "
+
+Loop details:
+
+xxx at Dan
+I'm not happy
+""
+
+Your Loop is here<http://dev.xxx.com/loop/view/4f50f20e160839c95a000bb3?_uid=4f3541a7ac63e655040008e3>.
+
+We will be in touch again with any further updates,
+
+xxx
+
+If you did not sign up to receive emails from us you can use the link below to unsubscribe. We apologize for any inconvenience.
+
+Unsubscribe<http://dev.xxx.com/user/unsubscribe/dan.le@example.com?verify=4a400554148256338956101abdf06406>

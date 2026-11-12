@@ -20,7 +20,7 @@
   "scripts": {
     "build": "npx tsc",
     "lint": "eslint .",
-    "unit": "node ./node_modules/nodeunit/bin/nodeunit test/test.js",
+    "unit": "node ./node_modules/nodeunit/bin/nodeunit test/test.js test/upstream.js",
     "test": "npm run unit && npm run lint"
   },
   "engines": {

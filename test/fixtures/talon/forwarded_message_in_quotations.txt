@@ -1,0 +1,13 @@
+Blah
+
+-----Original Message-----
+
+FYI
+
+---------- Forwarded message ----------
+From: bob@example.com
+Date: Tue, Sep 4, 2012 at 1:35 PM
+Subject: Two
+line subject
+To: rob@example.com
+
