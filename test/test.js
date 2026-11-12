@@ -1,4 +1,5 @@
 import fs from "fs";
+import vm from "vm";
 import EmailReplyParser from "../dist/emailreplyparser.js";
 import RegexList from "../dist/regex.js";
 import { fileURLToPath } from 'url';
@@ -970,6 +971,12 @@ const SAMPLE_HEADERS = [
   "Am Fr., 28. Nov. 2025 um 15:57 Uhr schrieb Test Mailer\n<test@example.com>:",
   "ср, 1 янв. 2024\u202fг. в 10:00, Иван <ivan@example.ru>:",
   "在 2021年5月3日 10:00，Jan <jan@example.cn> 写道：",
+  "2021. 5. 3. 오전 10:00, Jan <jan@example.kr>님이 작성:",
+  "2021/05/03 10:00、Jan <jan@example.jp> のメッセージ:",
+  "2024-01-01 10:00 GMT+01:00 John <john@example.com>:",
+  "Von: Hans Muster <hans@example.de>",
+  "Van: Jan Jansen <jan@example.nl>",
+  "Da: Mario Rossi <mario@example.it>",
   "Hans Muster\n<hans@example.de> schrieb:",
   "John Doe on Monday at 10:00 wrote:",
   "From : John Doe\n<john@example.com>",
@@ -1018,12 +1025,42 @@ export function test_sample_headers_are_detected(test) {
   test.done();
 }
 
+export function test_every_quote_header_pattern_has_a_sample(test) {
+  // Hostile inputs are derived from samples, so a pattern without one would not be stressed
+  RegexList.quoteHeadersRegex.forEach((regex) => {
+    test.ok(SAMPLE_HEADERS.some((header) => regex.test(header)), `no sample for ${regex.source}`);
+  });
+
+  test.done();
+}
+
 export function test_patterns_stay_linear_on_hostile_input(test) {
-  // Linear patterns take ~1ms on these inputs; backtracking ones take seconds
+  // Linear patterns take ~1ms on these inputs; backtracking ones take seconds or never end
   const inputs = hostile_inputs();
+  const context = vm.createContext({});
 
   RegexList.quoteHeadersRegex.concat(RegexList.signatureRegex).forEach((regex) => {
-    const worst = Math.max(...inputs.map((text) => elapsed(() => text.match(regex))));
+    const worst = Math.max(...inputs.map((text) => {
+      Object.assign(context, { source: regex.source, flags: regex.flags, text });
+
+      // The vm timeout interrupts a regex stuck in backtracking, so the test fails instead of hanging
+      const measure = () => {
+        try {
+          return elapsed(() => vm.runInContext("text.match(new RegExp(source, flags))", context, { timeout: 1000 }));
+        } catch {
+          return Infinity;
+        }
+      };
+
+      // Retry slow runs to ignore CPU hiccups; a backtracking pattern stays slow every time
+      let duration = measure();
+
+      for (let attempt = 0; attempt < 2 && duration >= 100 && duration !== Infinity; attempt++) {
+        duration = Math.min(duration, measure());
+      }
+
+      return duration;
+    }));
 
     test.ok(worst < 100, `${worst.toFixed(0)}ms for ${regex.source}`);
   });
