@@ -1,5 +1,5 @@
 // Fixtures ported from github/email_reply_parser (MIT), willdurand/EmailReplyParser (MIT), mailgun/talon (Apache 2.0),
-// discourse/email_reply_trimmer (MIT) and zapier/email-reply-parser (MIT)
+// discourse/email_reply_trimmer (MIT), zapier/email-reply-parser (MIT) and alfonsrv/mail-parser-reply (MIT)
 import fs from "fs";
 import EmailReplyParser from "../dist/emailreplyparser.js";
 import { fileURLToPath } from "url";
@@ -50,7 +50,6 @@ const KNOWN_GAPS = [
   "talon/original_message_indicator_2",
   "talon/original_message_indicator_3",
   "talon/original_message_indicator_5",
-  "talon/original_message_indicator_6",
   "talon/pattern_on_date_polymail",
   "talon/pattern_on_date_somebody_sent",
   "talon/pattern_ukrainian_date_somebody_wrote",
@@ -81,8 +80,35 @@ const KNOWN_GAPS = [
   "discourse/embedded_email_russian_1",
   "discourse/embedded_email_russian_2",
   "discourse/embedded_email_spanish_2",
-  "discourse/embedded_email_ukrainian"
+  "discourse/embedded_email_ukrainian",
+  "alfonsrv/begins_with_signature",
+  "alfonsrv/email_sent_from_not_signature"
 ];
+
+// Per alfonsrv case: text the reply must keep, and text of the quoted mail it must hide
+const ALFONSRV_CASES = {
+  begins_with_signature: ["I have sent an invite for 10:30am", "wrote:"], // Raw quoted-printable, decoded upstream in practice
+  caution: ["Hi lads's Team", null],
+  caution2: ["I am trying to place an order", null],
+  email_danish_1: ["Tak for din mail", "Hvordan går det med projektet?"],
+  email_danish_2: ["Jeg har modtaget filerne", "Her er filerne du bad om"],
+  email_danish_3: ["Svar.", "Oprindelig besked."],
+  email_danish_4: ["Svar.", "-----Oprindelig meddelelse-----"],
+  email_danish_5: ["Kh\nPeter", null],
+  email_gmail: ["This is a test for inbox replying to a github message.", "Steven Scott"],
+  email_ja_1_2: ["それでは 11:00 にお待ちしております。", "田中太郎 <taro.tanaka@example.com>"],
+  email_nl_1_2: ["Outlook met een antwoord", "Google Apps Sync Team"],
+  email_pl_1_1: ["Od: Jan Kowalski <jan.kowalski@example.com>\nWysłano:", null],
+  email_pl_1_2: ["Od: Jan Kowalski <jan.kowalski@example.com>\nWysłano:", "Wszystko w porządku"],
+  email_pl_1_3: ["Od: Jan Kowalski <jan.kowalski@example.com>\nWysłano:", null],
+  email_sent_from_not_signature: ["Sent from my desk, is much easier than my mobile phone.", null],
+  email_sv_anon_1: ["Berättar gärna", "skrev Person B"],
+  email_swedish_1: ["Ursäkta mitt sena svar!", "Jag har försökt få tag"],
+  email_swedish_2: ["It's amazing I would love", "Anna Andersson <anna.andersson@acme.com> skrev:"],
+  forward: ["Can I get 1 Arrival Notice without PU# and invoice?", null],
+  multi_header: ["No problem. I’ll just start a new order.", "Original Message"],
+  outlook: ["What is the best way to clear a Riak bucket", null]
+};
 
 // Quote headers from willdurand/EmailReplyParser, each must hide the quoted mail below it
 const DATE_HEADERS = [
@@ -440,6 +466,19 @@ export function test_zapier_partial_quote_header(test) {
   test.ok(reply.startsWith("On your remote host you can run:"));
   test.ok(reply.includes("telnet 127.0.0.1 52698"));
   test.ok(reply.includes("This should connect to TextMate"));
+
+  test.done();
+}
+
+// alfonsrv/mail-parser-reply
+
+export function test_alfonsrv_replies(test) {
+  Object.entries(ALFONSRV_CASES).forEach(([name, [kept, hidden]]) => {
+    const reply = parse_reply("alfonsrv/" + name);
+    const passes = reply.includes(kept) && (hidden === null || !reply.includes(hidden));
+
+    check(test, "alfonsrv/" + name, true, passes);
+  });
 
   test.done();
 }

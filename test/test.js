@@ -980,6 +980,11 @@ const SAMPLE_HEADERS = [
   "  2016-10-24 15:36 GMT+02:00 Foo bar <info@foo.bar>:",
   "2016-03-03 17:21 GMT+01:00 Some One",
   "2013/7/20 sam via Discourse Meta <info@discourse.org>",
+  "2022年1月1日(金) 9:00 田中太郎 <taro.tanaka@example.com>:",
+  "ons 4 dec. 2024 kl. 20:42 skrev Person B <person.b@email.com>:",
+  "4 dec. 2024 kl. 18:36 skrev Person A <person.a@email.com>:",
+  "Den fre 28 feb. 2025 10:15Anna Andersson <anna.andersson@acme.com> skrev:",
+  "-----Oprindelig meddelelse-----",
   "Von: Hans Muster <hans@example.de>",
   "Van: Jan Jansen <jan@example.nl>",
   "Da: Mario Rossi <mario@example.it>",
@@ -1007,7 +1012,8 @@ const NOT_HEADERS = [
   "2016-10-24 15:36 deploy finished on <server>:",
   "2016-10-24 15:36 GMT+01:00 deploy: done",
   "2016-10-24 15:36 see <b>this</b>:",
-  "From: Paris\nTo: London"
+  "From: Paris\nTo: London",
+  "Han skrev till mig 4 dec. 2024 kl. 18:36:"
 ];
 
 // Inputs that open a header and never complete it, repeated on one line and on many lines
@@ -1045,7 +1051,12 @@ export function test_sample_headers_are_detected(test) {
 export function test_every_quote_header_pattern_has_a_sample(test) {
   // Hostile inputs are derived from samples, so a pattern without one would not be stressed
   RegexList.quoteHeadersRegex.forEach((regex) => {
-    test.ok(SAMPLE_HEADERS.some((header) => regex.test(header)), `no sample for ${regex.source}`);
+    // Some patterns only match after a blank line, as headers appear in an email
+    const matches = (header) => {
+      return regex.test(header) || regex.test("\n\n" + header);
+    };
+
+    test.ok(SAMPLE_HEADERS.some(matches), `no sample for ${regex.source}`);
   });
 
   test.done();

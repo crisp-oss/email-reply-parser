@@ -1,0 +1,21 @@
+Outlook met een antwoord
+
+
+------------------------------
+
+*Van:* Google Apps Sync Team [mailto:mail-noreply@google.com]
+*Verzonden:* donderdag, 9 februari 2012 13:36
+*Aan:* jow@xxxx.com
+*Onderwerp:* Google Apps Sync is bijgewerkt!
+
+
+
+Beste Google Apps Sync-gebruiker,
+
+Google Apps Sync voor Microsoft Outlook® is onlangs bijgewerkt. Uw computer heeft nu de nieuwste versie (versie 2.5). Deze release bevat bugfixes om de productbetrouwbaarheid te verbeteren. Voor meer informatie over deze en andere wijzigingen, zie het helpartikel hier:
+
+http://www.google.com/support/a/bin/answer.py?answer=153463
+
+Met vriendelijke groet,
+
+Het Google Apps Sync Team.

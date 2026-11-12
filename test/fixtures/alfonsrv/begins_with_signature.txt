@@ -1,0 +1,220 @@
+Thank you, Sonya Johnson.
+
+I have sent an invite for 10:30am Monday PDT (today).  I
+hope you can join.
+
+Regards,
+
+Christopher Edwards
+
+
+On Mon, Jun 3, 2024 at 12:53=E2=80=AFAM Cody Hart <omerritt@example.com> w=
+rote:
+
+> Hi Christopher Edwards,
+>
+> 10.30 AM pacific is good for me.
+>
+> Thanks & Regards,
+>
+> Cody Hart
+>
+>
+> ------------------------------
+> *From:* Stephanie Johnson DDS <dawnnelson@example.org>
+> *Sent:* Saturday, June 1, 2024 10:13 AM
+> *To:* Cody Hart <omerritt@example.com>
+> *Cc:* Jared Kennedy <philip74@example.net>; Tina Harvey <
+> toddmarie@example.com>; Samantha Rowe <francisphillip@example.net>; melanie67@example.com =
+<
+> melanie67@example.com>
+> *Subject:* [EXTERNAL] Re: Re: Re: [zAgile Support] Duplicate Jira records
+> created
+>
+> Hi Sonya Johnson,
+>
+> Thank you for the follow up.  We will need a call to investigate this
+> further.  Please let us know of your availability for Tuesday or Wednesda=
+y
+> next week between 8:30am - 10:30am pacific.
+>
+> Regards,
+>
+> Mario Hart
+>
+>
+> On Fri, May 31, 2024 at 9:17=E2=80=AFAM Cody Hart <omerritt@example.com>=
+ wrote:
+>
+> Hi Evan Grant,
+>
+> Please find the comments inline in below mail chain. Please let me know i=
+f
+> you have any query.
+>
+> Thanks & Regards,
+>
+> Cody Hart
+>
+>
+>
+> ------------------------------
+> *From:* Tina Harvey <toddmarie@example.com>
+> *Sent:* Thursday, May 30, 2024 11:08 PM
+> *To:* Cody Hart <omerritt@example.com>
+> *Cc:* melanie67@example.com <melanie67@example.com>; Samantha Rowe <
+> francisphillip@example.net>; Jared Kennedy <philip74@example.net>
+> *Subject:* [EXTERNAL] Re: Re: [zAgile Support] Duplicate Jira records
+> created
+>
+> Hi Sonya Johnson,
+>
+> For the example you provided with 7 duplicates, it will help to know more
+> details:
+>
+> 1) Was the issue created manually from Salesforce?, I mean a user clicked
+> on +New button to create the Issue? --> Yes
+> 2) Do you have an Apex trigger/ Flow / Apex Job using our zAgileConnect
+> API to automatically create Issues based on some event?  --> No
+> 3) Do you have auto-create Issues enabled in our package configuration
+> step 3 "Select Jira Projects and Issue types", if so please send a
+> screenshot of the autocreate configuration--> Not Enabled
+> 4) Is there a match on the created date of the duplicates with Case
+> creation or some Case update? I do not see any match, please see the date=
+s:
+> Case Created Date
+> Case Last Modified Date
+> Jira Issue CreatedDate
+>  5/22/2024, 8:56 AM
+> , 5/30/2024, 7:13 AM
+> 5/30/2024, 5:58 AM
+>
+> 5) Is it possible to try to manually create (using the +New button) a new
+> test Issue from that Case? and see if it creates duplicates? --> Yes we
+> can create few test issues on test case to debug and then we will to clos=
+e
+> or delete those issue. Let me know when you want to try.
+>
+> Regards,
+> Jean
+>
+>
+> On Thu, May 30, 2024 at 11:45=E2=80=AFAM Sagar Kumar <omerritt@example.com=
+> wrote:
+>
+> Hi Christopher Edwards,
+>
+> Thanks for the response.
+> We are seeing this error multiple times. I checked with different users
+> and got to know that it is happening intermittently and on single click
+> only. Today we saw a use case where 7 duplicate records were created.
+> Another example:
+> Can you please look into this?
+>
+> Thanks & Regards,
+>
+> Cody Hart
+>
+>
+> ------------------------------
+> *From:* Stephanie Johnson DDS <dawnnelson@example.org>
+> *Sent:* Thursday, May 23, 2024 12:49 AM
+> *To:* Cody Hart <omerritt@example.com>
+> *Cc:* Samantha Rowe <francisphillip@example.net>; Jared Kennedy <philip74@example.net>;
+> melanie67@example.com <melanie67@example.com>; toddmarie@example.com <
+> toddmarie@example.com>
+> *Subject:* [EXTERNAL] Re: [zAgile Support] Duplicate Jira records created
+>
+> Hi Sonya Johnson,
+>
+> Thank you for contacting us.  The possible scenarios that may cause
+> multiple issues to be created are likely to be user related, i.e. if ther=
+e
+> is some lag in receiving a response from Jira on Issue creation and the
+> user initiates a second action.  This is of course if the Issue creation
+> process is manual.  If an automation is involved then you will want to
+> check the Flow or trigger logic.
+>
+> Regards,
+>
+> Sanjiva
+>
+>
+> On Wed, May 22, 2024 at 11:04=E2=80=AFAM zAgile Support <support@zagile.c=
+om>
+> wrote:
+>
+> Greetings Cody Hart,
+>
+> Thank you for contacting Davis, Keller and Miller. We have successfully received
+> your request. Our support staff will review your request and respond
+> appropriately.
+>
+> Sincerely,
+> zAgile Support Team
+>
+> For any additional follow ups or to reply to this email, please contact u=
+s
+> melanie67@example.com.
+>
+> >>Please do not type below this line
+> --
+> Your request #<US_BANK_NUMBER>: "[zAgile Support] Duplicate Jira records created"
+> has been created.
+> ref:!00D3001HLZ4.!500RP0CAKGQ:ref
+> --
+> On 5/22/2024, Cody Hart <omerritt@example.com> wrote:
+> > Hi Medina, Rowe and Burgess,
+>
+> We saw few scenarios where duplicate Jira records got created
+>
+> Case number 1: <US_BANK_NUMBER>
+> [cid:32c17e29-42d6-4e29-bacc-c20e50a78c9c]
+>
+> Case number 2: <US_BANK_NUMBER>
+> [cid:e167dfff-e6c1-4f37-bf06-f15fb2c68a0a]
+>
+> Are you aware of such issue or could you let us know this is happening
+>
+> Thanks & Regards,
+> Cody Hart
+> Senior Salesforce Developer
+> Ph: 365.390.8222
+> [cid:6d65deca-da47-4c9f-ba28-397f3ffc5449]
+> This message, together with any attachments, is intended only for the use
+> of the individual or entity to which it is addressed and may contain
+> confidential and/or privileged information. If you are not the intended
+> recipient(s), or the employee or agent responsible for delivery of this
+> message to the intended recipient(s), you are hereby notified that any
+> dissemination, distribution or copying of this message, or any attachment=
+,
+> is strictly prohibited. If you have received this message in error, pleas=
+e
+> immediately notify the sender and delete the message, together with any
+> attachments, from your computer. Thank you for your cooperation.
+>
+> To unsubscribe from this group and stop receiving emails from it, send an
+> email to hickmanlori@example.org.
+>
+> ------------------------------
+> *EXTERNAL MESSAGE WARNING: This email originated from outside of
+> Hernandez, Reed and Gross. Do not click links or open attachments unless you recognize
+> the sender and know the content is safe. Please see this wiki for more
+> information on email safety:
+> https://frye-brown.com/
+>
+> ------------------------------
+> *EXTERNAL MESSAGE WARNING: This email originated from outside of
+> Hernandez, Reed and Gross. Do not click links or open attachments unless you recognize
+> the sender and know the content is safe. Please see this wiki for more
+> information on email safety:
+> http://duarte-sharp.org/
+>
+> ------------------------------
+> *EXTERNAL MESSAGE WARNING: This email originated from outside of
+> Hernandez, Reed and Gross. Do not click links or open attachments unless you recognize
+> the sender and know the content is safe. Please see this wiki for more
+> information on email safety:
+> https://www.clark.com/
+>
+

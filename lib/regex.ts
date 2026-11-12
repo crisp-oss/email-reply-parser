@@ -84,7 +84,10 @@ function fieldBlockHeader(fromFields: string[], sentFields: string[]): RegExp {
   const next = `(?:${HS}|\\n${HS}*)${field(sentFields)}`;
   const sender = `${upTo(next)}(?:\\n${upTo(next)})?`;
 
-  return new RegExp(`^(?<!.\\n)${HS}*(${field(fromFields)}${sender}${next})`, "m");
+  // After a blank line, or alone on a single line (the parser checks lines one by one)
+  const start = "(?:(?<=\\n\\n)|(?<![\\s\\S])(?![\\s\\S]*\\n))";
+
+  return new RegExp(`^${start}${HS}*(${field(fromFields)}${sender}${next})`, "m");
 }
 
 /**
@@ -139,6 +142,9 @@ const QUOTE_HEADERS_PATTERNS: RegExp[] = [
   nativeTrailingKeyword("", "在", "写道："), // > 在 DATE, TIME, NAME 写道： (at most 2 lines)
   /^(20[0-9]{2}\..+\s작성:)$/m, // DATE TIME NAME 작성:
   /^(20[0-9]{2}\/.+のメッセージ:)$/m, // DATE TIME、NAME のメッセージ:
+  new RegExp(`^${HS}*(20[0-9]{2}年[0-9]{1,2}月[0-9]{1,2}日.*${WRAPPED_EMAIL}:)$`, "m"), // 20YY年M月D日(曜) H:MM NAME <EMAIL>: (Gmail)
+  new RegExp(`^${HS}*((?:[a-zåäö]{3,4}\\.?\\s)?[0-9]{1,2}\\.?\\s[a-zåäö]{3,4}\\.?\\s20[0-9]{2}\\s(?:kl\\.\\s)?[0-9]{1,2}[:.][0-9]{2}\\sskrev\\s.+${WRAPPED_EMAIL}:)$`, "m"), // ons 4 dec. 2024 kl. 20:42 skrev NAME <EMAIL>: (Gmail, Swedish)
+  new RegExp(`^${HS}*(Den\\s.+${WRAPPED_EMAIL}\\s?skrev:)$`, "m"), // Den DATE NAME <EMAIL> skrev:
   new RegExp(`^((?:.+${LT}|.${upTo(`${HS}<`)}${HS})<.+>\\sschrieb:)$`, "m"), // NAME <EMAIL> schrieb:
   new RegExp(`^(.${upTo("\\son")}\\son${upTo("at")}at.*wrote:|.+${LT}on${upTo("at")}at.*wrote:)$`, "m"), // NAME on DATE wrote:
   nativeFieldHeader("From", "\\[|<", "\\]|>"), // "From: NAME <EMAIL>" OR "From : NAME <EMAIL>" OR "From : NAME<EMAIL>"(With support whitespace before start and before <)
@@ -156,6 +162,7 @@ const QUOTE_HEADERS_PATTERNS: RegExp[] = [
   new RegExp(`^(${upTo("[0-9]{4}")})[0-9]{4}${upTo("from")}from${upTo("<")}<.*>:$`), // DATE from NAME <EMAIL>:
   separatorHeader("Original Message"), // -----Original Message-----
   separatorHeader("Oprindelig Besked"), // -------- Oprindelig besked --------
+  separatorHeader("Oprindelig meddelelse"), // -----Oprindelig meddelelse-----
   separatorHeader("Message d'origine"), // -------- Message d'origine --------
   separatorHeader("Ursprüngliche Nachricht") // -----Ursprüngliche Nachricht-----
 ];
