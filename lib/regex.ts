@@ -22,7 +22,8 @@ const WRAPPED_EMAIL = "<[^<>@\\n]*(?:\\n[^<>@\\n]*)?@[^<>\\n]*(?:\\n[^<>\\n]*)?>
 const FROM_FIELDS = ["From", "Von", "Van", "Från", "Fra", "De", "Da", "Từ", "Od", "От"];
 const SENT_FIELDS = [
   "Sent", "Date", "Gesendet", "Datum", "Verzonden", "Skickat", "Sendt", "Dato", "Envoyé le",
-  "Envoyé", "Inviato", "Data", "Enviado", "Gửi", "Wysłano", "Отправлено"
+  "Envoyé", "Enviado el", "Enviada em", "Fecha", "Inviato", "Data", "Enviado", "Gửi", "Wysłano",
+  "Отправлено"
 ];
 
 /**************************************************************************
@@ -134,6 +135,7 @@ const QUOTE_HEADERS_PATTERNS: RegExp[] = [
   nativeOpenKeyword("-*", "Il", "scritto:{0,1}", "\\s{0,1}-*"), // Il DATE, NAME <EMAIL> ha scritto:
   nativeOpenKeyword("-*", "Em", "escreveu:{0,1}", "\\s{0,1}-*"), // Em DATE, NAME <EMAIL> ha escreveu:
   nativeBoundedKeyword("Op\\s", "schreef"), // Op DATE, schreef NAME <EMAIL>: (at most 3 lines)
+  new RegExp(`^(.*${WRAPPED_EMAIL}\\s?(?:napisał(?:\\(a\\))?|pisze):)$`, "m"), // DATE NAME <EMAIL> napisał(a): (Gmail, Polish)
   nativeTrailingKeyword(`${HS}*`, "(W\\sdniu|Dnia)\\s", "(pisze|napisał(\\(a\\))?):", "mu"), // W dniu DATE, NAME <EMAIL> pisze|napisał: (at most 2 lines)
   nativeOpenKeywordName("Den", "skrev", 1, ".+"), // Den DATE skrev NAME <EMAIL>:
   nativeOpenKeyword("", "pe", "kirjoitti:", ""), // pe DATE NAME <EMAIL> kirjoitti:
@@ -164,6 +166,7 @@ const QUOTE_HEADERS_PATTERNS: RegExp[] = [
   separatorHeader("Oprindelig Besked"), // -------- Oprindelig besked --------
   separatorHeader("Oprindelig meddelelse"), // -----Oprindelig meddelelse-----
   separatorHeader("Message d'origine"), // -------- Message d'origine --------
+  separatorHeader("Mensaje original"), // -----Mensaje original-----
   separatorHeader("Ursprüngliche Nachricht") // -----Ursprüngliche Nachricht-----
 ];
 

@@ -985,6 +985,12 @@ const SAMPLE_HEADERS = [
   "4 dec. 2024 kl. 18:36 skrev Person A <person.a@email.com>:",
   "Den fre 28 feb. 2025 10:15Anna Andersson <anna.andersson@acme.com> skrev:",
   "-----Oprindelig meddelelse-----",
+  "-----Mensaje original-----",
+  "De: Juan Pérez\nEnviado el: lunes, 1 de enero de 2024 10:00",
+  "De: Juan Pérez\nFecha: lunes, 1 de enero de 2024 10:00",
+  "De: João Silva\nEnviada em: segunda-feira, 1 de janeiro de 2024 10:00",
+  "pon., 1 sty 2024 o 10:00 Jan Kowalski <jan@example.pl> napisał(a):",
+  "23 mar 2017 21:25 \"Neil Lalonde\" <meta@discoursemail.com> napisał(a):",
   "Von: Hans Muster <hans@example.de>",
   "Van: Jan Jansen <jan@example.nl>",
   "Da: Mario Rossi <mario@example.it>",
@@ -1013,7 +1019,8 @@ const NOT_HEADERS = [
   "2016-10-24 15:36 GMT+01:00 deploy: done",
   "2016-10-24 15:36 see <b>this</b>:",
   "From: Paris\nTo: London",
-  "Han skrev till mig 4 dec. 2024 kl. 18:36:"
+  "Han skrev till mig 4 dec. 2024 kl. 18:36:",
+  "Jan napisał(a) do mnie wczoraj:"
 ];
 
 // Inputs that open a header and never complete it, repeated on one line and on many lines

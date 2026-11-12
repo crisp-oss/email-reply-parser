@@ -76,10 +76,8 @@ const KNOWN_GAPS = [
   "discourse/embedded_email_german_4",
   "discourse/embedded_email_german_5",
   "discourse/embedded_email_german_6",
-  "discourse/embedded_email_polish_2",
   "discourse/embedded_email_russian_1",
   "discourse/embedded_email_russian_2",
-  "discourse/embedded_email_spanish_2",
   "discourse/embedded_email_ukrainian",
   "alfonsrv/begins_with_signature",
   "alfonsrv/email_sent_from_not_signature"
