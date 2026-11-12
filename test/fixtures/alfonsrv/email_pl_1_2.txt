@@ -1,0 +1,19 @@
+Od: Jan Kowalski <jan.kowalski@example.com>
+Wysłano: środa, 1 marca 2023 12:00
+Do: Anna Nowak <anna.nowak@example.com>
+Temat: Re: Test email
+
+Czesc Anno,
+
+Jak się masz?
+
+Pozdrawiam,
+Jan
+
+Dnia 28 lutego 2023 14:00 Anna Nowak <anna.nowak@example.com> napisał(a):
+> Czesc Janie,
+>
+> Wszystko w porządku, dziękuję. A ty?
+>
+> Pozdrawiam,
+> Ania

@@ -1,0 +1,8 @@
+Hi
+
+  *From:* bob@example.com [mailto:
+  bob@example.com]
+  *Sent:* Wednesday, June 27, 2012 3:05 PM
+  *To:* travis@example.com
+  *Subject:* Hello
+

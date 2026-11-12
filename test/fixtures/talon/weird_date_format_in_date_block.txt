@@ -1,0 +1,6 @@
+Blah
+Date: Fri=2C 28 Sep 2012 10:55:48 +0000
+From: tickets@example.com
+To: bob@example.com
+Subject: [Ticket #8] Test
+

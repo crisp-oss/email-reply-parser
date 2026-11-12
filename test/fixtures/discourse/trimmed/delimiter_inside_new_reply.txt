@@ -1,0 +1,10 @@
+Hello Firstname,
+
+This is the first part of the new reply.
+
+________________________________________________________________________________
+
+This is the second part of the new reply.
+
+Best regards,
+Firstname Lastname

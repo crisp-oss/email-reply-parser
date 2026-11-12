@@ -1,0 +1,8 @@
+I looked at the proposal and would like the following changes:
+
+   -
+
+   Rename the first field on the form.
+   *
+
+   Add a short description below it.

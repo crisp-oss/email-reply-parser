@@ -1,5 +1,7 @@
 import fs from "fs";
+import vm from "vm";
 import EmailReplyParser from "../dist/emailreplyparser.js";
+import RegexList from "../dist/regex.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -946,5 +948,218 @@ export function test_parseReplied_with_multiple_quotes(test) {
   test.equal(true, /Hi folks/.test(quoted));
   test.equal(true, /riak-users mailing list/.test(quoted));
   
+  test.done();
+}
+
+const SAMPLE_HEADERS = [
+  "On Mon, Jan 1, 2024 at 10:00 AM John Doe <john@example.com> wrote:",
+  "On Mon, Jan 1, 2024 at 10:00 AM John Doe <\njohn@example.com> wrote:",
+  "On Mon, Jan 1, 2024 at 10:00 AM John Doe\n<john@example.com> wrote:",
+  "Le lun. 1 janv. 2024 à 10:00, Jean Dupont <jean@example.fr> a écrit :",
+  "El lun, 1 ene 2024 a las 10:00, Juan (<juan@example.es>) escribió:",
+  "Il giorno lun 1 gen 2024 alle ore 10:00 Gianni <gianni@example.it> ha scritto:",
+  "Em seg., 1 de jan. de 2024 às 10:00, João <joao@example.br> escreveu:",
+  "Op ma 3 mei 2021 om 10:00 schreef Jan <jan@example.nl>:",
+  "Op ma 3 mei 2021 om 10:00 schreef Jan\n<jan@example.nl>:",
+  "Op ma 3 mei 2021\nom 10:00 schreef Jan <jan@example.nl>:",
+  "W dniu 3.05.2021 o 10:00 Jan <jan@example.pl> napisał:",
+  "Dnia 3.05.2021 Jan <\njan@example.pl> napisał(a):",
+  "Den 1. jan. 2024 kl. 10.00 skrev Jens <jens@example.dk>:",
+  "Den 1. jan. 2024 kl. 10.00\nskrev Jens <jens@example.dk>:",
+  "pe 1. tammik. 2024 klo 10.00 Matti <matti@example.fi> kirjoitti:",
+  "Am Fr., 28. Nov. 2025 um 15:57 Uhr schrieb Test Mailer <test@example.com>:",
+  "Am Fr., 28. Nov. 2025 um 15:57 Uhr schrieb Test Mailer\n<test@example.com>:",
+  "ср, 1 янв. 2024\u202fг. в 10:00, Иван <ivan@example.ru>:",
+  "在 2021年5月3日 10:00，Jan <jan@example.cn> 写道：",
+  "2021. 5. 3. 오전 10:00, Jan <jan@example.kr>님이 작성:",
+  "2016. 11. 8. 오후 12:39 Test user <test@example.com> 작성:",
+  "2024년 1월 3일 (수) 오후 3:21, 홍길동 <gildong@example.kr>님이 작성:",
+  "2017년 5월 2일 오후 3:05, 홍길동 <gildong@example.kr>님이 작성하였습니다:",
+  "보낸 사람: 홍길동 <gildong@example.kr>\n보낸 날짜: 2024년 1월 3일 수요일 오후 3:21",
+  "张三 <zhangsan@example.cn> 于2024年1月3日周三 15:21写道：",
+  "張三 <zhangsan@example.tw> 於 2024年1月3日 週三 下午3:21寫道：",
+  "在 2016年11月8日，下午2:23，Test user <test@example.com> 寫道：",
+  "发件人: Company Questions <questions@company.com>\n发送时间: 2017年8月2日 15:37",
+  "发件人：张三\n发送时间：2024年1月3日 15:21",
+  "寄件者: 張三 <zhangsan@example.tw>\n寄件日期: 2024年1月3日 下午 03:21",
+  "ti 3. tammik. 2024 klo 15.21 Matti Meikäläinen <matti@example.fi> kirjoitti:",
+  "su 20. lokakuuta 2017 klo 17.50 John Coe\n<s.testtesttest.i@test.com> kirjoitti:",
+  "Lähettäjä: Matti Meikäläinen <matti@example.fi>\nLähetetty: keskiviikko 3. tammikuuta 2024 15.21",
+  "2021/05/03 10:00、Jan <jan@example.jp> のメッセージ:",
+  "2024-01-01 10:00 GMT+01:00 John <john@example.com>:",
+  "2016-10-24 15:36 GMT+02:00 Foo bar <\ninfo@foo.bar>:",
+  "2016-10-24 15:36 GMT+02:00 Foo bar\n<info@foo.bar>:",
+  "2016-10-24 15:36 GMT+02:00 A very long author name\n<a-very-long-notification-address@\nforum.example.com>:",
+  "  2016-10-24 15:36 GMT+02:00 Foo bar <info@foo.bar>:",
+  "2016-03-03 17:21 GMT+01:00 Some One",
+  "2013/7/20 sam via Discourse Meta <info@discourse.org>",
+  "2022年1月1日(金) 9:00 田中太郎 <taro.tanaka@example.com>:",
+  "ons 4 dec. 2024 kl. 20:42 skrev Person B <person.b@email.com>:",
+  "4 dec. 2024 kl. 18:36 skrev Person A <person.a@email.com>:",
+  "Den fre 28 feb. 2025 10:15Anna Andersson <anna.andersson@acme.com> skrev:",
+  "-----Oprindelig meddelelse-----",
+  "-----Mensaje original-----",
+  "De: Juan Pérez\nEnviado el: lunes, 1 de enero de 2024 10:00",
+  "De: Juan Pérez\nFecha: lunes, 1 de enero de 2024 10:00",
+  "De: João Silva\nEnviada em: segunda-feira, 1 de janeiro de 2024 10:00",
+  "pon., 1 sty 2024 o 10:00 Jan Kowalski <jan@example.pl> napisał(a):",
+  "23 mar 2017 21:25 \"Neil Lalonde\" <meta@discoursemail.com> napisał(a):",
+  "----- Reply message -----",
+  "------------------ 原始邮件 ------------------",
+  "*----- Original Message -----*",
+  "2015-10-18 0:17 GMT+03:00 Matt Palmer <info@discourse.org>:",
+  "вт, 5 янв. 2016 г. в 23:39, Erlend Sogge Heggen <info@discourse.org>:",
+  "суббота, 14 марта 2015 г. пользователь etewiah написал:",
+  "30 серп. 2016 р. 20:45 \"Arpit\" no-reply@example.com пише:",
+  "Op 24 aug. 2013 om 16:48 heeft ven88 via Discourse Meta <info@discourse.org> het volgende geschreven:",
+  "Max Mustermann <try_discourse@discoursemail.com> schrieb am Fr., 28.\nApr. 2017 um 11:53 Uhr:",
+  "Am 18.09.2013 um 16:24 schrieben Sie:",
+  "Le 4 janv. 2016 19:03, Neil nous a dit :",
+  "At 6/16/2016 08:32 PM, you wrote:",
+  "Some One <info@discourse.org> wrote:",
+  "Gavin Sinclair (gsinclair@soyabean.com.au) wrote:",
+  "In message <1234@example.com>, John writes:",
+  "søn. 30. apr. 2017 kl. 00.26 skrev David Taylor <meta@discoursemail.com>:",
+  "Von: Hans Muster <hans@example.de>",
+  "Van: Jan Jansen <jan@example.nl>",
+  "Da: Mario Rossi <mario@example.it>",
+  "From: somebody@example.com\nSent: March-19-11 5:42 PM",
+  "*Von:* somebody@example.com\n*Gesendet:* Dienstag, 25. November 2014 14:59",
+  "*From:* bob@example.com [mailto:\nbob@example.com]\n*Sent:* Wednesday, June 27, 2012 3:05 PM",
+  "Hans Muster\n<hans@example.de> schrieb:",
+  "John Doe on Monday at 10:00 wrote:",
+  "From : John Doe\n<john@example.com>",
+  "De : Jean Dupont <jean@example.fr>",
+  "man. 3. maj 2021 10.00 skrev Jan\n<jan@example.dk>:",
+  "01.01.2024 10:00 \"John\" <john@example.com>:",
+  "10:00, 1 Jan 2024, \"John\" <john@example.com>:",
+  "1 Jan 2024 at 10:00 from John <john@example.com>:",
+  "In data 1 gen 2024 10:00, Gianni <gianni@example.it> ha scritto:",
+  "-----Original Message-----",
+  "----- original message",
+  "-------- Oprindelig besked --------",
+  "-------- Message d'origine",
+  "-----Ursprüngliche Nachricht-----"
+];
+
+// Body lines that look like quote headers but must stay visible
+const NOT_HEADERS = [
+  "2016-10-24 15:36 deploy finished on <server>:",
+  "2016-10-24 15:36 GMT+01:00 deploy: done",
+  "2016-10-24 15:36 see <b>this</b>:",
+  "From: Paris\nTo: London",
+  "Han skrev till mig 4 dec. 2024 kl. 18:36:",
+  "Jan napisał(a) do mnie wczoraj:",
+  "Le directeur nous a dit :",
+  "Am Ende schrieben Sie:",
+  "Op de site heeft hij het volgende geschreven:",
+  "Вчера пользователь Иван написал:",
+  "In message board posts, John writes:",
+  "to the team, Matti kirjoitti:",
+  "他说他于2024年会写道：",
+  "2024년 1월 3일에 홍길동님이 작성한 문서:"
+];
+
+// Inputs that open a header and never complete it, repeated on one line and on many lines
+function hostile_inputs() {
+  const units = new Set(["\n", " \n", "\n\n", " ", "x ", "- ", "<", "< ", "[", ": ", "12", "1234 "]);
+
+  SAMPLE_HEADERS.forEach((header) => {
+    [header.slice(0, 8), header.slice(0, 8) + "\n", header.slice(0, -1), header.slice(0, -1) + "\n",
+      header.replace(/ /g, "\n")].forEach((unit) => units.add(unit));
+  });
+
+  return [...units].map((unit) => unit.repeat(Math.ceil(32000 / unit.length)));
+}
+
+function elapsed(run) {
+  const start = performance.now();
+
+  run();
+
+  return performance.now() - start;
+}
+
+export function test_sample_headers_are_detected(test) {
+  const parser = new EmailReplyParser();
+
+  SAMPLE_HEADERS.forEach((header) => {
+    const reply = parser.parseReply("Hello there\n\n" + header + "\n\n> Quoted text");
+
+    test.equal("Hello there", reply.trim(), JSON.stringify(header));
+  });
+
+  test.done();
+}
+
+export function test_every_quote_header_pattern_has_a_sample(test) {
+  // Hostile inputs are derived from samples, so a pattern without one would not be stressed
+  RegexList.quoteHeadersRegex.forEach((regex) => {
+    // Some patterns only match after a blank line, as headers appear in an email
+    const matches = (header) => {
+      return regex.test(header) || regex.test("\n\n" + header);
+    };
+
+    test.ok(SAMPLE_HEADERS.some(matches), `no sample for ${regex.source}`);
+  });
+
+  test.done();
+}
+
+export function test_body_lines_are_not_quote_headers(test) {
+  const parser = new EmailReplyParser();
+
+  NOT_HEADERS.forEach((line) => {
+    const text = "Hello there\n\n" + line + "\n\nStill my reply";
+
+    test.equal(text, parser.parseReply(text).trim(), JSON.stringify(line));
+  });
+
+  test.done();
+}
+
+export function test_patterns_stay_linear_on_hostile_input(test) {
+  // Linear patterns take ~1ms on these inputs; backtracking ones take seconds or never end
+  const inputs = hostile_inputs();
+  const context = vm.createContext({});
+
+  RegexList.quoteHeadersRegex.concat(RegexList.signatureRegex).forEach((regex) => {
+    const worst = Math.max(...inputs.map((text) => {
+      Object.assign(context, { source: regex.source, flags: regex.flags, text });
+
+      // The vm timeout interrupts a regex stuck in backtracking, so the test fails instead of hanging
+      const measure = () => {
+        try {
+          return elapsed(() => vm.runInContext("text.match(new RegExp(source, flags))", context, { timeout: 1000 }));
+        } catch {
+          return Infinity;
+        }
+      };
+
+      // Retry slow runs to ignore CPU hiccups; a backtracking pattern stays slow every time
+      let duration = measure();
+
+      for (let attempt = 0; attempt < 2 && duration >= 100 && duration !== Infinity; attempt++) {
+        duration = Math.min(duration, measure());
+      }
+
+      return duration;
+    }));
+
+    test.ok(worst < 100, `${worst.toFixed(0)}ms for ${regex.source}`);
+  });
+
+  test.done();
+}
+
+export function test_parser_stays_linear_on_hostile_email(test) {
+  const parser = new EmailReplyParser();
+
+  hostile_inputs().forEach((text) => {
+    const duration = elapsed(() => parser.parseReply("Hello\n" + text));
+
+    test.ok(duration < 1000, `${duration.toFixed(0)}ms on ${JSON.stringify(text.slice(0, 40))}`);
+  });
+
   test.done();
 }

@@ -1,0 +1,9 @@
+Blah
+
+On Monday, 24 September, 2012 at 3:46 PM, bob wrote:
+
+> [Ticket #50] test from bob
+>
+> View ticket (http://example.com/action
+_nonce=3dd518)
+>

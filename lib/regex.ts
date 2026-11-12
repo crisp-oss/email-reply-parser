@@ -6,19 +6,238 @@
  */
 
 /**************************************************************************
- * IMPORTS
+ * CONSTANTS
  ***************************************************************************/
 
-// NPM
-import { createRequire } from "module";
-import type RE2 from "re2";
+// Patterns must stay linear on backtracking engines: no nested or adjacent unbounded quantifiers
+
+// Line terminators, and whitespace that is not a line terminator
+const LT = "[\\n\\r\\u2028\\u2029]";
+const HS = "[^\\S\\n\\r\\u2028\\u2029]";
+
+// "<EMAIL>" that may wrap once before and once after the "@"
+const WRAPPED_EMAIL = "<[^<>@\\n]*(?:\\n[^<>@\\n]*)?@[^<>\\n]*(?:\\n[^<>\\n]*)?>";
+
+// Sender and sent date field names of Outlook-style header blocks, per language
+const FROM_FIELDS = [
+  "From", "Von", "Van", "Från", "Fra", "De", "Da", "Từ", "Od", "От", "Lähettäjä", "보낸 ?사람", "发件人",
+  "寄件者"
+];
+const SENT_FIELDS = [
+  "Sent", "Date", "Gesendet", "Datum", "Verzonden", "Skickat", "Sendt", "Dato", "Envoyé le",
+  "Envoyé", "Enviado el", "Enviada em", "Fecha", "Inviato", "Data", "Enviado", "Gửi", "Wysłano",
+  "Отправлено", "Lähetetty", "보낸 ?날짜", "发送时间", "寄件日期"
+];
+
+/**************************************************************************
+ * HELPERS
+ ***************************************************************************/
+
+/**
+ * Any characters up to the first STOP on the line (a single way to split, so no backtracking)
+ */
+function upTo(stop: string): string {
+  return `(?:(?!${stop}).)*`;
+}
+
+/**
+ * Native variant of "OPEN DATE NAME <EMAIL> KEYWORD" headers (same matches)
+ */
+function nativeOpenKeyword(
+  prefix: string, open: string, keyword: string, suffix: string
+): RegExp {
+  return new RegExp(
+    `^${prefix}${HS}*(${open}\\s(?:.+${LT}|.\\S*${HS}).+\\n?${keyword})${suffix}$`, "m"
+  );
+}
+
+/**
+ * Native variant of "OPEN DATE KEYWORD NAME <EMAIL>:" headers (same matches)
+ */
+function nativeOpenKeywordName(
+  open: string, keyword: string, newlines: number, rest: string
+): RegExp {
+  const gap = "\\n?".repeat(newlines);
+
+  return new RegExp(
+    `^${HS}*(${open}\\s(?:.+${LT}${gap}${keyword}\\s|.+${HS}\\n${gap.slice(3)}${keyword}\\s|` +
+      `.+${HS}${keyword}${LT}|.${upTo(`${HS}${keyword}${HS}`)}${HS}${keyword}${HS})${rest}):$`,
+    "m"
+  );
+}
+
+/**
+ * Native variant of "KEYWORD: NAME <EMAIL>" headers (same matches)
+ */
+function nativeFieldHeader(keyword: string, open: string, close: string): RegExp {
+  return new RegExp(
+    `^${HS}*(${keyword}\\s?:(?:.+${LT}\\s*[${open}]|.[^${open}\\n\\r\\u2028\\u2029]*[${open}])` +
+      `.+[${close}])`,
+    "m"
+  );
+}
+
+/**
+ * "FROM: SENDER" (may wrap once) then "SENT: DATE", after a blank line (optionally bold)
+ */
+function fieldBlockHeader(fromFields: string[], sentFields: string[]): RegExp {
+  const field = (names: string[]) => {
+    return `\\*?(?:${names.join("|")})${HS}?[:：]\\*?`;
+  };
+
+  const next = `(?:${HS}|\\n${HS}*)${field(sentFields)}`;
+  const sender = `${upTo(next)}(?:\\n${upTo(next)})?`;
+
+  // After a blank line, or alone on a single line (the parser checks lines one by one)
+  const start = "(?:(?<=\\n\\n)|(?<![\\s\\S])(?![\\s\\S]*\\n))";
+
+  return new RegExp(`^${start}${HS}*(${field(fromFields)}${sender}${next})`, "m");
+}
+
+/**
+ * Native variant of "OPEN ... KEYWORD ...:" headers spanning at most 3 lines (same matches)
+ */
+function nativeBoundedKeyword(open: string, word: string, isDelimited = false): RegExp {
+  // A delimited word needs whitespace around it, where a line boundary counts as whitespace
+  const keyword = isDelimited ? `(?:[^\\S\\n]|^)${word}(?:[^\\S\\n]|$)` : word;
+
+  return new RegExp(
+    `^${HS}*(${open}(?:[^\\n]+\\n(?:(?=[^\\n]*?${keyword})[^\\n]*\\n[^\\n]*|` +
+      `(?=(?:(?!${keyword})[^\\n])*${keyword}[^\\n]*:$)[^\\n]*)|` +
+      `(?=[^\\n]+?${keyword})[^\\n]*\\n[^\\n]*|` +
+      `(?=[^\\n](?:(?!${keyword})[^\\n])*${keyword}[^\\n]*:$)[^\\n]*):)$`,
+    "m"
+  );
+}
+
+/**
+ * Native variant of "OPEN ... KEYWORD" headers spanning at most 2 lines
+ */
+function nativeTrailingKeyword(
+  prefix: string, open: string, keyword: string, flags = "m"
+): RegExp {
+  return new RegExp(`^${prefix}(${open}[^\\n]+(?:\\n[^\\n]*)?${keyword})$`, flags);
+}
+
+/**
+ * "-----TITLE-----" separator headers, optionally bold (trailing dashes are optional)
+ */
+function separatorHeader(title: string): RegExp {
+  return new RegExp(`^\\*?-{1,30} ?${title} ?-{0,30}\\*?$`, "i");
+}
+
+/* eslint-disable max-len */
+/**************************************************************************
+ * CONSTANTS
+ ***************************************************************************/
+
+const QUOTE_HEADERS_PATTERNS: RegExp[] = [
+  nativeOpenKeyword("-*", "On", "wrote:{0,1}", "\\s{0,1}-*"), // On DATE, NAME <EMAIL> wrote:
+  nativeOpenKeyword("-*", "Le", "écrit\\s?:{0,1}", "\\s{0,1}-*"), // Le DATE, NAME <EMAIL> a écrit :
+  nativeOpenKeyword("-*", "El", "escribió:{0,1}", "\\s{0,1}-*"), // El DATE, NAME <EMAIL> escribió:
+  nativeOpenKeyword("-*", "Il", "scritto:{0,1}", "\\s{0,1}-*"), // Il DATE, NAME <EMAIL> ha scritto:
+  nativeOpenKeyword("-*", "Em", "escreveu:{0,1}", "\\s{0,1}-*"), // Em DATE, NAME <EMAIL> ha escreveu:
+  nativeBoundedKeyword("Op\\s", "schreef"), // Op DATE, schreef NAME <EMAIL>: (at most 3 lines)
+  new RegExp(`^(.*${WRAPPED_EMAIL}\\s?(?:napisał(?:\\(a\\))?|pisze):)$`, "m"), // DATE NAME <EMAIL> napisał(a): (Gmail, Polish)
+  nativeTrailingKeyword(`${HS}*`, "(W\\sdniu|Dnia)\\s", "(pisze|napisał(\\(a\\))?):", "mu"), // W dniu DATE, NAME <EMAIL> pisze|napisał: (at most 2 lines)
+  nativeOpenKeywordName("Den", "skrev", 1, ".+"), // Den DATE skrev NAME <EMAIL>:
+  nativeOpenKeyword("", "(?:ma|ti|ke|to|pe|la|su)(?=\\s[0-9])", "kirjoitti:", ""), // pe DATE NAME <EMAIL> kirjoitti:
+  nativeOpenKeywordName("Am", "schrieb", 2, `(?:.+\\s?[\\[<]\\n.+[\\]>]|.+${LT}[\\[<].+[\\]>]|.+${LT}|.+)`), // Am DATE schrieb NAME <EMAIL>: OR Am DATE um TIME schrieb NAME <EMAIL>: (with optional newline after <)
+  new RegExp(`^${HS}*(ср\\,\\s(?:.+\\n\\u202fг\\. в\\s|.+\\u202fг\\. в${LT}|.${upTo(`\\u202fг\\. в${HS}`)}\\u202fг\\. в${HS})(?:.+,${LT}|.${upTo(`,${HS}`)},${HS}).[^\\[|<\\n\\r\\u2028\\u2029]*[\\[|<].+[\\]|>]:)$`, "m"), // ср, DATE г. в TIME, NAME <EMAIL>:
+  new RegExp(`^${HS}*([а-яіїєґ]{2},\\s.+${WRAPPED_EMAIL}\\s?(?:написала?|написа|пише)?:)$`, "m"), // вт, DATE, NAME <EMAIL>: (Gmail, Cyrillic)
+  new RegExp(`^${HS}*([а-я]+,\\s[0-9]{1,2}\\s[а-я]+\\s[0-9]{4}\\sг\\.\\sпользователь\\s.+\\sнаписала?:)$`, "m"), // DAY, DD MONTH YYYY г. пользователь NAME написал:
+  new RegExp(`^${HS}*([0-9]{1,2}\\s${upTo("\\s20[0-9]{2}\\sр\\.")}\\s20[0-9]{2}\\sр\\.\\s.+\\sпише:)$`, "m"), // DD MON. 20YY р. TIME NAME EMAIL пише:
+  nativeTrailingKeyword(`${HS}*`, "Op\\s(?=[^\\n]*[0-9])", "het volgende geschreven:"), // Op DATE heeft NAME <EMAIL> het volgende geschreven:
+  new RegExp(`^([^>\\n].*${WRAPPED_EMAIL}\\sschrieb am\\s(?:.*:|.*\\n.*:))$`, "m"), // NAME <EMAIL> schrieb am DATE: (Google Inbox, may wrap)
+  nativeTrailingKeyword(`${HS}*`, "Am\\s(?=[^\\n]*[0-9])", "schrieben Sie:"), // Am DATE schrieben Sie:
+  nativeTrailingKeyword(`${HS}*`, "Le\\s(?=[^\\n]*[0-9])", "nous a dit\\s?:"), // Le DATE, NAME nous a dit :
+  new RegExp(`^${HS}*(At\\s[0-9]{1,2}/[0-9]{1,2}/[0-9]{2,4}\\s.*wrote:)$`, "m"), // At M/D/YYYY TIME, NAME wrote: (Eudora)
+  new RegExp(`^([^>\\n].*(?:${WRAPPED_EMAIL}|\\([^()\\s@]+@[^()\\s]+\\))\\swrote:)$`, "m"), // NAME <EMAIL> wrote: OR NAME (EMAIL) wrote:
+  new RegExp(`^${HS}*(In message\\s<[^<>\\n]+>.*\\swrites:)$`, "m"), // In message <ID>, NAME writes:
+  nativeTrailingKeyword("", "在", "[写寫]道[：:]"), // > 在 DATE, TIME, NAME 写道： (at most 2 lines)
+  new RegExp(`^([^>\\n].*${WRAPPED_EMAIL}\\s?[于於]\\s?20[0-9]{2}年.*[写寫]道[：:])$`, "m"), // NAME <EMAIL> 于DATE写道： (Gmail, Chinese)
+  /^(20[0-9]{2}\..+\s작성:)$/m, // DATE TIME NAME 작성:
+  new RegExp(`^${HS}*(20[0-9]{2}년\\s?[0-9]{1,2}월\\s?[0-9]{1,2}일.*(?:\\n.*)?님이\\s?작성(?:하였습니다)?:)$`, "m"), // 20YY년 M월 D일 (수) TIME, NAME <EMAIL>님이 작성: (Gmail, Korean)
+  /^(20[0-9]{2}\/.+のメッセージ:)$/m, // DATE TIME、NAME のメッセージ:
+  new RegExp(`^${HS}*(20[0-9]{2}年[0-9]{1,2}月[0-9]{1,2}日.*${WRAPPED_EMAIL}:)$`, "m"), // 20YY年M月D日(曜) H:MM NAME <EMAIL>: (Gmail)
+  new RegExp(`^${HS}*((?:[a-zåäö]{3,4}\\.?\\s)?[0-9]{1,2}\\.?\\s[a-zåäö]{3,4}\\.?\\s20[0-9]{2}\\s(?:kl\\.\\s)?[0-9]{1,2}[:.][0-9]{2}\\sskrev\\s.+${WRAPPED_EMAIL}:)$`, "m"), // ons 4 dec. 2024 kl. 20:42 skrev NAME <EMAIL>: (Gmail, Swedish)
+  new RegExp(`^${HS}*(Den\\s.+${WRAPPED_EMAIL}\\s?skrev:)$`, "m"), // Den DATE NAME <EMAIL> skrev:
+  new RegExp(`^((?:.+${LT}|.${upTo(`${HS}<`)}${HS})<.+>\\sschrieb:)$`, "m"), // NAME <EMAIL> schrieb:
+  new RegExp(`^(.${upTo("\\son")}\\son${upTo("at")}at.*wrote:|.+${LT}on${upTo("at")}at.*wrote:)$`, "m"), // NAME on DATE wrote:
+  nativeFieldHeader("From", "\\[|<", "\\]|>"), // "From: NAME <EMAIL>" OR "From : NAME <EMAIL>" OR "From : NAME<EMAIL>"(With support whitespace before start and before <)
+  nativeFieldHeader("Von", "\\[|<", "\\]|>"), // "Von: NAME <EMAIL>" OR "Von : NAME <EMAIL>" OR "Von : NAME<EMAIL>"(With support whitespace before start and before <)
+  nativeFieldHeader("De", "\\[<", "\\]>"), // "De: NAME <EMAIL>" OR "De : NAME <EMAIL>" OR "De : NAME<EMAIL>"  (With support whitespace before start and before <)
+  nativeFieldHeader("Van", "\\[<", "\\]>"), // "Van: NAME <EMAIL>" OR "Van : NAME <EMAIL>" OR "Van : NAME<EMAIL>"  (With support whitespace before start and before <)
+  nativeFieldHeader("Da", "\\[<", "\\]>"), // "Da: NAME <EMAIL>" OR "Da : NAME <EMAIL>" OR "Da : NAME<EMAIL>"  (With support whitespace before start and before <)
+  fieldBlockHeader(FROM_FIELDS, SENT_FIELDS), // "From: SENDER" + "Sent: DATE" (Outlook header block, without <EMAIL>)
+  new RegExp(`^${HS}*(20[0-9]{2}-[0-9]{2}.[0-9]{2}.[0-9]{1,2}:[0-9]{2}(?:.*\\n)?.*${WRAPPED_EMAIL}:)$`, "m"), // 20YY-MM-DD HH:II GMT+01:00 NAME <EMAIL>: (may wrap)
+  new RegExp(`^${HS}*(20[0-9]{2}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2} GMT[+-][0-9]{2}:[0-9]{2} [^<>@:\\n]+)$`, "m"), // 20YY-MM-DD HH:II GMT+01:00 NAME (Gmail, without <EMAIL>)
+  new RegExp(`^${HS}*(20[0-9]{2}/[0-9]{1,2}/[0-9]{1,2} .+<[^<>@\\n]+@[^<>\\n]+>:?)$`, "m"), // 20YY/M/D NAME <EMAIL> (Gmail, older locales)
+  nativeBoundedKeyword("[a-zæøå]{3,4}\\.\\s", "skrev", true), // DATE skrev NAME <EMAIL>: (at most 3 lines)
+  new RegExp(`^([0-9]{2}).[0-9]{2}.20[0-9]{2}${upTo("[0-9]{2}.[0-9]{2}")}[0-9]{2}.[0-9]{2}${upTo("\" *<")}" *<.*> *:$`, "m"), // DD.MM.20YY HH:II NAME <EMAIL>
+  new RegExp(`^[0-9]{2}:[0-9]{2}(${upTo("[0-9]{4}")})[0-9]{4}${upTo("\" *<")}" *<.*> *:$`), // HH:II, DATE, NAME <EMAIL>:
+  new RegExp(`^(${upTo("[0-9]{4}")})[0-9]{4}${upTo("from")}from${upTo("<")}<.*>:$`), // DATE from NAME <EMAIL>:
+  separatorHeader("Original Message"), // -----Original Message-----
+  separatorHeader("Oprindelig Besked"), // -------- Oprindelig besked --------
+  separatorHeader("Oprindelig meddelelse"), // -----Oprindelig meddelelse-----
+  separatorHeader("Message d'origine"), // -------- Message d'origine --------
+  separatorHeader("Mensaje original"), // -----Mensaje original-----
+  separatorHeader("Ursprüngliche Nachricht"), // -----Ursprüngliche Nachricht-----
+  separatorHeader("Reply Message"), // ----- Reply message -----
+  separatorHeader("原始邮件") // ------------------ 原始邮件 ------------------
+];
+
+const SIGNATURE_PATTERNS: RegExp[] = [
+  /^\s*-{2,4}$/, // Separator
+  /^\s*_{2,4}$/, // Separator
+  /^-- $/, // Separator
+  /^\+{2,4}$/, // Separator
+  /^\={2,4}$/, // Separator
+  /^________________________________$/, // Separator
+
+  // EN
+  /^Sent from (?:\s*.+)$/, // en
+  /^Get Outlook for (?:\s*.+).*/m, // en
+  /^Cheers,?!?$/mi, // en
+  /^Best wishes,?!?$/mi, // en
+  /^\w{0,20}\s?(\sand\s)?Regards,?!?！?$/mi, //en
+
+  // DE
+  /^Von (?:\s*.+) gesendet$/, // de
+  /^Gesendet von (?:\s*.+) für (?:\s*.+)$/, // de
+
+  // DA
+  /^Sendt fra (?:\s*.+)$/, // da
+
+  // FR
+  /^Envoyé depuis (?:\s*.+)$/, //fr
+  /^Envoyé de mon (?:\s*.+)$/, // fr - e.g. Envoyé de mon iPhone
+  /^Envoyé à partir de (?:\s*.+)$/, //fr
+  /^Télécharger Outlook pour (?:\s*.+).*/m, // fr
+  /^Bien . vous,?!?$/mi, // fr
+  /^\w{0,20}\s?cordialement,?!?$/mi, // fr
+  /^Bonne (journ.e|soir.e)!?$/mi, // fr
+
+  // ES
+  /^Enviado desde (?:\s*.+)$/, // es,
+
+  // IT
+  nativeOpenKeyword("-*", "In\\sdata", "scritto:{0,1}", "\\s{0,1}-*"), // it,
+
+  // NL
+  /^Verzonden vanaf (?:\s*.+)$/, // nl - e.g. Verzonden vanaf (Outlook voor Android<https://aka.ms/12345>|mijn iPad)
+  /^Verstuurd vanaf (?:\s*.+)$/  // nl - e.g. Verstuurd vanaf mijn iPad/iPhone
+];
+/* eslint-enable max-len */
+
+/**************************************************************************
+ * CLASS
+ ***************************************************************************/
 
 /**
  * RegexList
  */
 class RegexList {
-  RE2: typeof RE2;
-  hasRE2: boolean;
   quoteHeadersRegex: RegExp[];
   signatureRegex: RegExp[];
 
@@ -26,119 +245,8 @@ class RegexList {
    * Constructor
    */
   constructor() {
-    this.hasRE2 = this.detectRE2();
-
-    /* eslint-disable max-len */
-    this.quoteHeadersRegex = this.buildSafeRegexes([
-      /^-*\s*(On\s.+\s.+\n?wrote:{0,1})\s{0,1}-*$/m, // On DATE, NAME <EMAIL> wrote:
-      /^-*\s*(Le\s.+\s.+\n?écrit\s?:{0,1})\s{0,1}-*$/m, // Le DATE, NAME <EMAIL> a écrit :
-      /^-*\s*(El\s.+\s.+\n?escribió:{0,1})\s{0,1}-*$/m, // El DATE, NAME <EMAIL> escribió:
-      /^-*\s*(Il\s.+\s.+\n?scritto:{0,1})\s{0,1}-*$/m, // Il DATE, NAME <EMAIL> ha scritto:
-      /^-*\s*(Em\s.+\s.+\n?escreveu:{0,1})\s{0,1}-*$/m, // Em DATE, NAME <EMAIL> ha escreveu:
-      /^\s*(Op\s[\s\S]+?\n?schreef[\s\S]+:)$/m, // Il DATE, schreef NAME <EMAIL>:
-      /^\s*((W\sdniu|Dnia)\s[\s\S]+?(pisze|napisał(\(a\))?):)$/mu, // W dniu DATE, NAME <EMAIL> pisze|napisał:
-      /^\s*(Den\s.+\s\n?skrev\s.+:)$/m, // Den DATE skrev NAME <EMAIL>:
-      /^\s*(pe\s.+\s.+\n?kirjoitti:)$/m, // pe DATE NAME <EMAIL> kirjoitti:
-      /^\s*(Am\s.+\s\n?\n?schrieb\s.+\s?((\[|<)\n?.+(\]|>))?):$/m, // Am DATE schrieb NAME <EMAIL>: OR Am DATE um TIME schrieb NAME <EMAIL>: (with optional newline after <)
-      /^\s*(ср\,\s.+\n? г\. в\s.+,\s.+[\[|<].+[\]|>]:)$/m, // ср, DATE г. в TIME, NAME <EMAIL>:
-      /^(在[\s\S]+写道：)$/m, // > 在 DATE, TIME, NAME 写道：
-      /^(20[0-9]{2}\..+\s작성:)$/m, // DATE TIME NAME 작성:
-      /^(20[0-9]{2}\/.+のメッセージ:)$/m, // DATE TIME、NAME のメッセージ:
-      /^(.+\s<.+>\sschrieb:)$/m, // NAME <EMAIL> schrieb:
-      /^(.+\son.*at.*wrote:)$/m, // NAME on DATE wrote:
-      /^\s*(From\s?:.+\s?\n?\s*[\[|<].+[\]|>])/m, // "From: NAME <EMAIL>" OR "From : NAME <EMAIL>" OR "From : NAME<EMAIL>"(With support whitespace before start and before <)
-      /^\s*(Von\s?:.+\s?\n?\s*[\[|<].+[\]|>])/m, // "Von: NAME <EMAIL>" OR "Von : NAME <EMAIL>" OR "Von : NAME<EMAIL>"(With support whitespace before start and before <)
-      /^\s*(De\s?:.+\s?\n?\s*(\[|<).+(\]|>))/m, // "De: NAME <EMAIL>" OR "De : NAME <EMAIL>" OR "De : NAME<EMAIL>"  (With support whitespace before start and before <)
-      /^\s*(Van\s?:.+\s?\n?\s*(\[|<).+(\]|>))/m, // "Van: NAME <EMAIL>" OR "Van : NAME <EMAIL>" OR "Van : NAME<EMAIL>"  (With support whitespace before start and before <)
-      /^\s*(Da\s?:.+\s?\n?\s*(\[|<).+(\]|>))/m, // "Da: NAME <EMAIL>" OR "Da : NAME <EMAIL>" OR "Da : NAME<EMAIL>"  (With support whitespace before start and before <)
-      /^(20[0-9]{2})-([0-9]{2}).([0-9]{2}).([0-9]{2}):([0-9]{2})\n?(.*)>:$/m, // 20YY-MM-DD HH:II GMT+01:00 NAME <EMAIL>:
-      /^\s*([a-z]{3,4}\.\s[\s\S]+\sskrev\s[\s\S]+:)$/m, // DATE skrev NAME <EMAIL>:
-      /^([0-9]{2}).([0-9]{2}).(20[0-9]{2})(.*)(([0-9]{2}).([0-9]{2}))(.*)\"( *)<(.*)>( *):$/m, // DD.MM.20YY HH:II NAME <EMAIL>
-      /^[0-9]{2}:[0-9]{2}(.*)[0-9]{4}(.*)\"( *)<(.*)>( *):$/, // HH:II, DATE, NAME <EMAIL>:
-      /^(.*)[0-9]{4}(.*)from(.*)<(.*)>:$/,
-      /^-{1,12} ?(O|o)riginal (M|m)essage ?-{1,12}$/i,
-      /^-{1,12} ?(O|o)prindelig (B|b)esked ?-{1,12}$/i,
-      /^-{1,12} ?(M|m)essage d\'origine ?-{1,12}$/i,
-      /^-{1,12} ?(U|u)rsprüngliche (N|n)achricht ?-{0,12}$/i
-    ]);
-
-    this.signatureRegex = this.buildSafeRegexes([
-      /^\s*-{2,4}$/, // Separator
-      /^\s*_{2,4}$/, // Separator
-      /^-- $/, // Separator
-      /^\+{2,4}$/, // Separator
-      /^\={2,4}$/, // Separator
-      /^________________________________$/, // Separator
-
-      // EN
-      /^Sent from (?:\s*.+)$/, // en
-      /^Get Outlook for (?:\s*.+).*/m, // en
-      /^Cheers,?!?$/mi, // en
-      /^Best wishes,?!?$/mi, // en
-      /^\w{0,20}\s?(\sand\s)?Regards,?!?！?$/mi, //en
-
-      // DE
-      /^Von (?:\s*.+) gesendet$/, // de
-      /^Gesendet von (?:\s*.+) für (?:\s*.+)$/, // de
-
-      // DA
-      /^Sendt fra (?:\s*.+)$/, // da
-
-      // FR
-      /^Envoyé depuis (?:\s*.+)$/, //fr
-      /^Envoyé de mon (?:\s*.+)$/, // fr - e.g. Envoyé de mon iPhone
-      /^Envoyé à partir de (?:\s*.+)$/, //fr
-      /^Télécharger Outlook pour (?:\s*.+).*/m, // fr
-      /^Bien . vous,?!?$/mi, // fr
-      /^\w{0,20}\s?cordialement,?!?$/mi, // fr
-      /^Bonne (journ.e|soir.e)!?$/mi, // fr
-
-      // ES
-      /^Enviado desde (?:\s*.+)$/, // es,
-
-      // IT
-      /^-*\s*(In\sdata\s.+\s.+\n?scritto:{0,1})\s{0,1}-*$/m, // it,
-
-      // NL
-      /^Verzonden vanaf (?:\s*.+)$/, // nl - e.g. Verzonden vanaf (Outlook voor Android<https://aka.ms/12345>|mijn iPad)
-      /^Verstuurd vanaf (?:\s*.+)$/  // nl - e.g. Verstuurd vanaf mijn iPad/iPhone
-    ]);
-    /* eslint-enable max-len */
-  }
-
-  /**
-   * Detect RE2
-   */
-  private detectRE2() {
-    try {
-      const require = createRequire(import.meta.url);
-
-      this.RE2 = require("re2");
-
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  /**
-   * Build Re2
-   */
-  private buildSafeRegexes(regexList: RegExp[]) {
-    return regexList.map((regex) => {
-      return this.buildSafeRegExp(regex);
-    });
-  }
-
-  /**
-   * Build Safe RegExp
-   */
-  private buildSafeRegExp(regex: RegExp): RegExp {
-    if (this.hasRE2) {
-      return new this.RE2(regex);
-    } else {
-      return new RegExp(regex);
-    }
+    this.quoteHeadersRegex = QUOTE_HEADERS_PATTERNS;
+    this.signatureRegex = SIGNATURE_PATTERNS;
   }
 }
 

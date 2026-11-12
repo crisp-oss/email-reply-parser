@@ -1,0 +1,13 @@
+Hello Firstname,
+
+This is the first part of the new reply.
+
+________________________________________________________________________________
+
+This is the second part of the new reply.
+
+Best regards,
+Firstname Lastname
+
+On July 28, 2026, Firstname Lastname wrote:
+> This is the previous quoted message.

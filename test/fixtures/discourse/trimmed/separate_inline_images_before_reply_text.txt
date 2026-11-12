@@ -1,0 +1,9 @@
+Hello Firstname,
+
+This is text before the inline images.
+
+<img src="cid:first-image@example.test">
+<img src="cid:second-image@example.test">
+<img src="cid:third-image@example.test">
+
+This is text after the inline images.
