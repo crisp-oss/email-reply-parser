@@ -15,6 +15,13 @@
 const LT = "[\\n\\r\\u2028\\u2029]";
 const HS = "[^\\S\\n\\r\\u2028\\u2029]";
 
+// Sender and sent date field names of Outlook-style header blocks, per language
+const FROM_FIELDS = ["From", "Von", "Van", "Från", "Fra", "De", "Da", "Từ", "Od", "От"];
+const SENT_FIELDS = [
+  "Sent", "Date", "Gesendet", "Datum", "Verzonden", "Skickat", "Sendt", "Dato", "Envoyé le",
+  "Envoyé", "Inviato", "Data", "Enviado", "Gửi", "Wysłano", "Отправлено"
+];
+
 /**************************************************************************
  * HELPERS
  ***************************************************************************/
@@ -61,6 +68,20 @@ function nativeFieldHeader(keyword: string, open: string, close: string): RegExp
       `.+[${close}])`,
     "m"
   );
+}
+
+/**
+ * "FROM: SENDER" (may wrap once) then "SENT: DATE", after a blank line (optionally bold)
+ */
+function fieldBlockHeader(fromFields: string[], sentFields: string[]): RegExp {
+  const field = (names: string[]) => {
+    return `\\*?(?:${names.join("|")})${HS}?:\\*?`;
+  };
+
+  const next = `(?:${HS}|\\n${HS}*)${field(sentFields)}`;
+  const sender = `${upTo(next)}(?:\\n${upTo(next)})?`;
+
+  return new RegExp(`^(?<!.\\n)${HS}*(${field(fromFields)}${sender}${next})`, "m");
 }
 
 /**
@@ -122,6 +143,7 @@ const QUOTE_HEADERS_PATTERNS: RegExp[] = [
   nativeFieldHeader("De", "\\[<", "\\]>"), // "De: NAME <EMAIL>" OR "De : NAME <EMAIL>" OR "De : NAME<EMAIL>"  (With support whitespace before start and before <)
   nativeFieldHeader("Van", "\\[<", "\\]>"), // "Van: NAME <EMAIL>" OR "Van : NAME <EMAIL>" OR "Van : NAME<EMAIL>"  (With support whitespace before start and before <)
   nativeFieldHeader("Da", "\\[<", "\\]>"), // "Da: NAME <EMAIL>" OR "Da : NAME <EMAIL>" OR "Da : NAME<EMAIL>"  (With support whitespace before start and before <)
+  fieldBlockHeader(FROM_FIELDS, SENT_FIELDS), // "From: SENDER" + "Sent: DATE" (Outlook header block, without <EMAIL>)
   /^(20[0-9]{2})-([0-9]{2}).([0-9]{2}).([0-9]{2}):([0-9]{2})\n?(.*)>:$/m, // 20YY-MM-DD HH:II GMT+01:00 NAME <EMAIL>:
   nativeBoundedKeyword("[a-z]{3,4}\\.\\s", "skrev", true), // DATE skrev NAME <EMAIL>: (at most 3 lines)
   new RegExp(`^([0-9]{2}).[0-9]{2}.20[0-9]{2}${upTo("[0-9]{2}.[0-9]{2}")}[0-9]{2}.[0-9]{2}${upTo("\" *<")}" *<.*> *:$`, "m"), // DD.MM.20YY HH:II NAME <EMAIL>
