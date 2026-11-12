@@ -1,4 +1,5 @@
-// Fixtures ported from github/email_reply_parser (MIT), willdurand/EmailReplyParser (MIT) and mailgun/talon (Apache 2.0)
+// Fixtures ported from github/email_reply_parser (MIT), willdurand/EmailReplyParser (MIT), mailgun/talon (Apache 2.0),
+// discourse/email_reply_trimmer (MIT) and zapier/email-reply-parser (MIT)
 import fs from "fs";
 import EmailReplyParser from "../dist/emailreplyparser.js";
 import { fileURLToPath } from "url";
@@ -21,6 +22,14 @@ const TALON_OVERRIDES = {
   quotation_between_reply_and_signature: "Reply"
 };
 
+// Discourse keeps signatures, inline quotes and drops forwarded mails, this parser does the opposite by design
+const DISCOURSE_KEEPS_SIGNATURE = [
+  "delimiter_inside_new_reply", "email_headers_5", "embedded_email_2", "embedded_email_swedish",
+  "inline_images_before_reply_text"
+];
+const DISCOURSE_KEEPS_QUOTES = ["quote_and_text", "quote_only", "reply_after_selected_german_quote"];
+const DISCOURSE_DROPS_FORWARDS = ["forwarded_gmail", "forwarded_message"];
+
 // Cases this parser does not handle yet; promote them out of this list once fixed
 const KNOWN_GAPS = [
   "github/email_2_2",
@@ -32,7 +41,6 @@ const KNOWN_GAPS = [
   "date_headers/7",
   "talon/android_wrote",
   "talon/client_android",
-  "talon/date_time_email_splitter",
   "talon/dutch_from_block",
   "talon/from_block_starts_with_date",
   "talon/link_breaks_quotation_markers_sequence_1",
@@ -43,7 +51,6 @@ const KNOWN_GAPS = [
   "talon/original_message_indicator_3",
   "talon/original_message_indicator_5",
   "talon/original_message_indicator_6",
-  "talon/pattern_date_email_with_unicode",
   "talon/pattern_on_date_polymail",
   "talon/pattern_on_date_somebody_sent",
   "talon/pattern_ukrainian_date_somebody_wrote",
@@ -54,7 +61,27 @@ const KNOWN_GAPS = [
   "talon/swedish_from_block",
   "talon/swedish_from_line",
   "talon/vietnamese_from_block",
-  "talon/weird_date_format_in_date_block"
+  "talon/weird_date_format_in_date_block",
+  "discourse/delimiters",
+  "discourse/email_headers_1",
+  "discourse/email_headers_2",
+  "discourse/embedded_email_5",
+  "discourse/embedded_email_7",
+  "discourse/embedded_email_9",
+  "discourse/embedded_email_12",
+  "discourse/embedded_email_13",
+  "discourse/embedded_email_16",
+  "discourse/embedded_email_17",
+  "discourse/embedded_email_18",
+  "discourse/embedded_email_french_1",
+  "discourse/embedded_email_german_4",
+  "discourse/embedded_email_german_5",
+  "discourse/embedded_email_german_6",
+  "discourse/embedded_email_polish_2",
+  "discourse/embedded_email_russian_1",
+  "discourse/embedded_email_russian_2",
+  "discourse/embedded_email_spanish_2",
+  "discourse/embedded_email_ukrainian"
 ];
 
 // Quote headers from willdurand/EmailReplyParser, each must hide the quoted mail below it
@@ -117,6 +144,25 @@ function check(test, id, expected, actual) {
   } else {
     test.equal(expected, actual, id);
   }
+}
+
+// Return the expected reply for a discourse case, adapted where this parser differs by design
+function discourse_expected(name) {
+  const expected = normalize(read_fixture("discourse/trimmed/" + name));
+
+  if (DISCOURSE_KEEPS_SIGNATURE.includes(name)) {
+    return expected.replace(/\n+[^\n]*regards,?(?:\n[\s\S]*)?$/i, "");
+  }
+
+  if (DISCOURSE_KEEPS_QUOTES.includes(name)) {
+    return expected.split("\n").filter((line) => !line.startsWith(">")).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+  }
+
+  if (DISCOURSE_DROPS_FORWARDS.includes(name)) {
+    return normalize(read_fixture("discourse/emails/" + name).replace(/\r\n/g, "\n"));
+  }
+
+  return expected;
 }
 
 // Return the actual reply for a talon case
@@ -357,6 +403,43 @@ export function test_talon_replies(test) {
   Object.keys(TALON_EXPECTED).forEach((name) => {
     check(test, "talon/" + name, talon_expected(name), talon_actual(name));
   });
+
+  test.done();
+}
+
+// discourse/email_reply_trimmer
+
+export function test_discourse_replies(test) {
+  fs.readdirSync(__dirname + "/fixtures/discourse/emails").forEach((file) => {
+    const name = file.replace(/\.txt$/, "");
+    const actual = normalize(new EmailReplyParser().parseReply(read_fixture("discourse/emails/" + name).trim()));
+
+    check(test, "discourse/" + name, discourse_expected(name), actual);
+  });
+
+  test.done();
+}
+
+// zapier/email-reply-parser
+
+export function test_zapier_gmail_inbox_reply(test) {
+  test.equal("This is a test for inbox replying to a github message.", parse_reply("zapier/email_gmail"));
+
+  test.done();
+}
+
+export function test_zapier_headers_without_delimiter(test) {
+  test.equal("And another reply!", parse_reply("zapier/email_headers_no_delimiter"));
+
+  test.done();
+}
+
+export function test_zapier_partial_quote_header(test) {
+  const reply = parse_reply("zapier/email_partial_quote_header");
+
+  test.ok(reply.startsWith("On your remote host you can run:"));
+  test.ok(reply.includes("telnet 127.0.0.1 52698"));
+  test.ok(reply.includes("This should connect to TextMate"));
 
   test.done();
 }

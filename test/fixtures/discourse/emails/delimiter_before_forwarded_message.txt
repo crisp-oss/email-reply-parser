@@ -1,0 +1,8 @@
+This is my new reply.
+
+----- Original Message -----
+From: Firstname Lastname <name@example.test>
+Date: July 28, 2026
+Subject: Example
+
+This is the previous message.

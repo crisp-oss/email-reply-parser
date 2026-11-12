@@ -1,0 +1,13 @@
+This is a long email with embedded code.
+
+```
+# This should not be deleted
+#
+
+# Or trimmed
+# It is code
+####
+Code code code
+```
+
+End of the email.

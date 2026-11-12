@@ -1,0 +1,9 @@
+Here is my reply with a bullet list:
+
+-
+First item.
+*
+Second item.
+
+--
+Signature line that should be trimmed.

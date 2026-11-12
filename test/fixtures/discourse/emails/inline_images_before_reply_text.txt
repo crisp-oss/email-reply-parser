@@ -1,0 +1,15 @@
+Hello Firstname,
+
+This is text before the inline image.
+
+**Screenshot**
+
+Image reference 2064 <img apple-inline="yes" id="A34F880A-3D2D-41B4-A4EE-22EA00C25DB3" src="cid:EBAE619D-7B1D-47E7-A652-BDB94969843A@example.test" class="">
+
+This is text after the inline image.
+
+Best regards,
+Firstname Lastname
+
+On July 28, 2026, Firstname Lastname wrote:
+> This is the previous quoted message.

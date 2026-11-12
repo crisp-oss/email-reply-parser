@@ -974,6 +974,12 @@ const SAMPLE_HEADERS = [
   "2021. 5. 3. 오전 10:00, Jan <jan@example.kr>님이 작성:",
   "2021/05/03 10:00、Jan <jan@example.jp> のメッセージ:",
   "2024-01-01 10:00 GMT+01:00 John <john@example.com>:",
+  "2016-10-24 15:36 GMT+02:00 Foo bar <\ninfo@foo.bar>:",
+  "2016-10-24 15:36 GMT+02:00 Foo bar\n<info@foo.bar>:",
+  "2016-10-24 15:36 GMT+02:00 A very long author name\n<a-very-long-notification-address@\nforum.example.com>:",
+  "  2016-10-24 15:36 GMT+02:00 Foo bar <info@foo.bar>:",
+  "2016-03-03 17:21 GMT+01:00 Some One",
+  "2013/7/20 sam via Discourse Meta <info@discourse.org>",
   "Von: Hans Muster <hans@example.de>",
   "Van: Jan Jansen <jan@example.nl>",
   "Da: Mario Rossi <mario@example.it>",
@@ -994,6 +1000,14 @@ const SAMPLE_HEADERS = [
   "-------- Oprindelig besked --------",
   "-------- Message d'origine",
   "-----Ursprüngliche Nachricht-----"
+];
+
+// Body lines that look like quote headers but must stay visible
+const NOT_HEADERS = [
+  "2016-10-24 15:36 deploy finished on <server>:",
+  "2016-10-24 15:36 GMT+01:00 deploy: done",
+  "2016-10-24 15:36 see <b>this</b>:",
+  "From: Paris\nTo: London"
 ];
 
 // Inputs that open a header and never complete it, repeated on one line and on many lines
@@ -1032,6 +1046,18 @@ export function test_every_quote_header_pattern_has_a_sample(test) {
   // Hostile inputs are derived from samples, so a pattern without one would not be stressed
   RegexList.quoteHeadersRegex.forEach((regex) => {
     test.ok(SAMPLE_HEADERS.some((header) => regex.test(header)), `no sample for ${regex.source}`);
+  });
+
+  test.done();
+}
+
+export function test_body_lines_are_not_quote_headers(test) {
+  const parser = new EmailReplyParser();
+
+  NOT_HEADERS.forEach((line) => {
+    const text = "Hello there\n\n" + line + "\n\nStill my reply";
+
+    test.equal(text, parser.parseReply(text).trim(), JSON.stringify(line));
   });
 
   test.done();

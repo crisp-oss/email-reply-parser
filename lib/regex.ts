@@ -15,6 +15,9 @@
 const LT = "[\\n\\r\\u2028\\u2029]";
 const HS = "[^\\S\\n\\r\\u2028\\u2029]";
 
+// "<EMAIL>" that may wrap once before and once after the "@"
+const WRAPPED_EMAIL = "<[^<>@\\n]*(?:\\n[^<>@\\n]*)?@[^<>\\n]*(?:\\n[^<>\\n]*)?>";
+
 // Sender and sent date field names of Outlook-style header blocks, per language
 const FROM_FIELDS = ["From", "Von", "Van", "Från", "Fra", "De", "Da", "Từ", "Od", "От"];
 const SENT_FIELDS = [
@@ -144,7 +147,9 @@ const QUOTE_HEADERS_PATTERNS: RegExp[] = [
   nativeFieldHeader("Van", "\\[<", "\\]>"), // "Van: NAME <EMAIL>" OR "Van : NAME <EMAIL>" OR "Van : NAME<EMAIL>"  (With support whitespace before start and before <)
   nativeFieldHeader("Da", "\\[<", "\\]>"), // "Da: NAME <EMAIL>" OR "Da : NAME <EMAIL>" OR "Da : NAME<EMAIL>"  (With support whitespace before start and before <)
   fieldBlockHeader(FROM_FIELDS, SENT_FIELDS), // "From: SENDER" + "Sent: DATE" (Outlook header block, without <EMAIL>)
-  /^(20[0-9]{2})-([0-9]{2}).([0-9]{2}).([0-9]{2}):([0-9]{2})\n?(.*)>:$/m, // 20YY-MM-DD HH:II GMT+01:00 NAME <EMAIL>:
+  new RegExp(`^${HS}*(20[0-9]{2}-[0-9]{2}.[0-9]{2}.[0-9]{2}:[0-9]{2}(?:.*\\n)?.*${WRAPPED_EMAIL}:)$`, "m"), // 20YY-MM-DD HH:II GMT+01:00 NAME <EMAIL>: (may wrap)
+  new RegExp(`^${HS}*(20[0-9]{2}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2} GMT[+-][0-9]{2}:[0-9]{2} [^<>@:\\n]+)$`, "m"), // 20YY-MM-DD HH:II GMT+01:00 NAME (Gmail, without <EMAIL>)
+  new RegExp(`^${HS}*(20[0-9]{2}/[0-9]{1,2}/[0-9]{1,2} .+<[^<>@\\n]+@[^<>\\n]+>:?)$`, "m"), // 20YY/M/D NAME <EMAIL> (Gmail, older locales)
   nativeBoundedKeyword("[a-z]{3,4}\\.\\s", "skrev", true), // DATE skrev NAME <EMAIL>: (at most 3 lines)
   new RegExp(`^([0-9]{2}).[0-9]{2}.20[0-9]{2}${upTo("[0-9]{2}.[0-9]{2}")}[0-9]{2}.[0-9]{2}${upTo("\" *<")}" *<.*> *:$`, "m"), // DD.MM.20YY HH:II NAME <EMAIL>
   new RegExp(`^[0-9]{2}:[0-9]{2}(${upTo("[0-9]{4}")})[0-9]{4}${upTo("\" *<")}" *<.*> *:$`), // HH:II, DATE, NAME <EMAIL>:
