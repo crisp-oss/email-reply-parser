@@ -1,5 +1,6 @@
 import fs from "fs";
 import EmailReplyParser from "../dist/emailreplyparser.js";
+import RegexList from "../dist/regex.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -946,5 +947,93 @@ export function test_parseReplied_with_multiple_quotes(test) {
   test.equal(true, /Hi folks/.test(quoted));
   test.equal(true, /riak-users mailing list/.test(quoted));
   
+  test.done();
+}
+
+const SAMPLE_HEADERS = [
+  "On Mon, Jan 1, 2024 at 10:00 AM John Doe <john@example.com> wrote:",
+  "On Mon, Jan 1, 2024 at 10:00 AM John Doe <\njohn@example.com> wrote:",
+  "On Mon, Jan 1, 2024 at 10:00 AM John Doe\n<john@example.com> wrote:",
+  "Le lun. 1 janv. 2024 à 10:00, Jean Dupont <jean@example.fr> a écrit :",
+  "El lun, 1 ene 2024 a las 10:00, Juan (<juan@example.es>) escribió:",
+  "Il giorno lun 1 gen 2024 alle ore 10:00 Gianni <gianni@example.it> ha scritto:",
+  "Em seg., 1 de jan. de 2024 às 10:00, João <joao@example.br> escreveu:",
+  "Op ma 3 mei 2021 om 10:00 schreef Jan <jan@example.nl>:",
+  "Op ma 3 mei 2021 om 10:00 schreef Jan\n<jan@example.nl>:",
+  "Op ma 3 mei 2021\nom 10:00 schreef Jan <jan@example.nl>:",
+  "W dniu 3.05.2021 o 10:00 Jan <jan@example.pl> napisał:",
+  "Dnia 3.05.2021 Jan <\njan@example.pl> napisał(a):",
+  "Den 1. jan. 2024 kl. 10.00 skrev Jens <jens@example.dk>:",
+  "Den 1. jan. 2024 kl. 10.00\nskrev Jens <jens@example.dk>:",
+  "pe 1. tammik. 2024 klo 10.00 Matti <matti@example.fi> kirjoitti:",
+  "Am Fr., 28. Nov. 2025 um 15:57 Uhr schrieb Test Mailer <test@example.com>:",
+  "Am Fr., 28. Nov. 2025 um 15:57 Uhr schrieb Test Mailer\n<test@example.com>:",
+  "ср, 1 янв. 2024\u202fг. в 10:00, Иван <ivan@example.ru>:",
+  "在 2021年5月3日 10:00，Jan <jan@example.cn> 写道：",
+  "Hans Muster\n<hans@example.de> schrieb:",
+  "John Doe on Monday at 10:00 wrote:",
+  "From : John Doe\n<john@example.com>",
+  "De : Jean Dupont <jean@example.fr>",
+  "man. 3. maj 2021 10.00 skrev Jan\n<jan@example.dk>:",
+  "01.01.2024 10:00 \"John\" <john@example.com>:",
+  "10:00, 1 Jan 2024, \"John\" <john@example.com>:",
+  "1 Jan 2024 at 10:00 from John <john@example.com>:",
+  "In data 1 gen 2024 10:00, Gianni <gianni@example.it> ha scritto:"
+];
+
+// Inputs that open a header and never complete it, repeated on one line and on many lines
+function hostile_inputs() {
+  const units = new Set(["\n", " \n", "\n\n", " ", "x ", "- ", "<", "< ", "[", ": ", "12", "1234 "]);
+
+  SAMPLE_HEADERS.forEach((header) => {
+    [header.slice(0, 8), header.slice(0, 8) + "\n", header.slice(0, -1), header.slice(0, -1) + "\n",
+      header.replace(/ /g, "\n")].forEach((unit) => units.add(unit));
+  });
+
+  return [...units].map((unit) => unit.repeat(Math.ceil(32000 / unit.length)));
+}
+
+function elapsed(run) {
+  const start = performance.now();
+
+  run();
+
+  return performance.now() - start;
+}
+
+export function test_sample_headers_are_detected(test) {
+  const parser = new EmailReplyParser();
+
+  SAMPLE_HEADERS.forEach((header) => {
+    const reply = parser.parseReply("Hello there\n\n" + header + "\n\n> Quoted text");
+
+    test.equal("Hello there", reply.trim(), JSON.stringify(header));
+  });
+
+  test.done();
+}
+
+export function test_patterns_stay_linear_on_hostile_input(test) {
+  // Linear patterns take ~1ms on these inputs; backtracking ones take seconds
+  const inputs = hostile_inputs();
+
+  RegexList.quoteHeadersRegex.concat(RegexList.signatureRegex).forEach((regex) => {
+    const worst = Math.max(...inputs.map((text) => elapsed(() => text.match(regex))));
+
+    test.ok(worst < 100, `${worst.toFixed(0)}ms for ${regex.source}`);
+  });
+
+  test.done();
+}
+
+export function test_parser_stays_linear_on_hostile_email(test) {
+  const parser = new EmailReplyParser();
+
+  hostile_inputs().forEach((text) => {
+    const duration = elapsed(() => parser.parseReply("Hello\n" + text));
+
+    test.ok(duration < 1000, `${duration.toFixed(0)}ms on ${JSON.stringify(text.slice(0, 40))}`);
+  });
+
   test.done();
 }

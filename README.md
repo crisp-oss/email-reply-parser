@@ -31,21 +31,9 @@ Install the project using NPM:
 npm install --save email-reply-parser
 ```
 
-## RE2 Support
+## ReDoS Protection
 
-This library uses the [RE2](https://github.com/uhop/node-re2) regex engine when available for better performance and [ReDoS](https://en.wikipedia.org/wiki/ReDoS) protection. It automatically falls back to native JavaScript `RegExp` if RE2 is unavailable or fails to load.
-
-RE2 is an optional dependency installed by default. If you encounter native compilation issues or want to exclude it:
-
-```bash
-npm uninstall re2
-```
-
-After a Node.js upgrade, you may need to rebuild RE2:
-
-```bash
-npm rebuild re2
-```
+This library has no native dependency. Its patterns are written to run in linear time on the native JavaScript `RegExp` engine, which protects against [ReDoS](https://en.wikipedia.org/wiki/ReDoS) on crafted emails.
 
 ## Features
 
