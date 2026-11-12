@@ -978,7 +978,12 @@ const SAMPLE_HEADERS = [
   "01.01.2024 10:00 \"John\" <john@example.com>:",
   "10:00, 1 Jan 2024, \"John\" <john@example.com>:",
   "1 Jan 2024 at 10:00 from John <john@example.com>:",
-  "In data 1 gen 2024 10:00, Gianni <gianni@example.it> ha scritto:"
+  "In data 1 gen 2024 10:00, Gianni <gianni@example.it> ha scritto:",
+  "-----Original Message-----",
+  "----- original message",
+  "-------- Oprindelig besked --------",
+  "-------- Message d'origine",
+  "-----Ursprüngliche Nachricht-----"
 ];
 
 // Inputs that open a header and never complete it, repeated on one line and on many lines

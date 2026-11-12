@@ -15,12 +15,16 @@
 const LT = "[\\n\\r\\u2028\\u2029]";
 const HS = "[^\\S\\n\\r\\u2028\\u2029]";
 
-// Whitespace-delimited "skrev" (a line boundary counts as whitespace)
-const SKREV = "(?:[^\\S\\n]|^)skrev(?:[^\\S\\n]|$)";
-
 /**************************************************************************
  * HELPERS
  ***************************************************************************/
+
+/**
+ * Any characters up to the first STOP on the line (a single way to split, so no backtracking)
+ */
+function upTo(stop: string): string {
+  return `(?:(?!${stop}).)*`;
+}
 
 /**
  * Native variant of "OPEN DATE NAME <EMAIL> KEYWORD" headers (same matches)
@@ -43,7 +47,7 @@ function nativeOpenKeywordName(
 
   return new RegExp(
     `^${HS}*(${open}\\s(?:.+${LT}${gap}${keyword}\\s|.+${HS}\\n${gap.slice(3)}${keyword}\\s|` +
-      `.+${HS}${keyword}${LT}|.(?:(?!${HS}${keyword}${HS}).)*${HS}${keyword}${HS})${rest}):$`,
+      `.+${HS}${keyword}${LT}|.${upTo(`${HS}${keyword}${HS}`)}${HS}${keyword}${HS})${rest}):$`,
     "m"
   );
 }
@@ -62,7 +66,10 @@ function nativeFieldHeader(keyword: string, open: string, close: string): RegExp
 /**
  * Native variant of "OPEN ... KEYWORD ...:" headers spanning at most 3 lines (same matches)
  */
-function nativeBoundedKeyword(open: string, keyword: string): RegExp {
+function nativeBoundedKeyword(open: string, word: string, isDelimited = false): RegExp {
+  // A delimited word needs whitespace around it, where a line boundary counts as whitespace
+  const keyword = isDelimited ? `(?:[^\\S\\n]|^)${word}(?:[^\\S\\n]|$)` : word;
+
   return new RegExp(
     `^${HS}*(${open}(?:[^\\n]+\\n(?:(?=[^\\n]*?${keyword})[^\\n]*\\n[^\\n]*|` +
       `(?=(?:(?!${keyword})[^\\n])*${keyword}[^\\n]*:$)[^\\n]*)|` +
@@ -70,6 +77,22 @@ function nativeBoundedKeyword(open: string, keyword: string): RegExp {
       `(?=[^\\n](?:(?!${keyword})[^\\n])*${keyword}[^\\n]*:$)[^\\n]*):)$`,
     "m"
   );
+}
+
+/**
+ * Native variant of "OPEN ... KEYWORD" headers spanning at most 2 lines
+ */
+function nativeTrailingKeyword(
+  prefix: string, open: string, keyword: string, flags = "m"
+): RegExp {
+  return new RegExp(`^${prefix}(${open}[^\\n]+(?:\\n[^\\n]*)?${keyword})$`, flags);
+}
+
+/**
+ * "-----TITLE-----" separator headers (trailing dashes are optional)
+ */
+function separatorHeader(title: string): RegExp {
+  return new RegExp(`^-{1,12} ?${title} ?-{0,12}$`, "i");
 }
 
 /* eslint-disable max-len */
@@ -84,30 +107,30 @@ const QUOTE_HEADERS_PATTERNS: RegExp[] = [
   nativeOpenKeyword("-*", "Il", "scritto:{0,1}", "\\s{0,1}-*"), // Il DATE, NAME <EMAIL> ha scritto:
   nativeOpenKeyword("-*", "Em", "escreveu:{0,1}", "\\s{0,1}-*"), // Em DATE, NAME <EMAIL> ha escreveu:
   nativeBoundedKeyword("Op\\s", "schreef"), // Op DATE, schreef NAME <EMAIL>: (at most 3 lines)
-  /^[^\S\n\r\u2028\u2029]*((W\sdniu|Dnia)\s[^\n]+(?:\n[^\n]*)?(pisze|napisał(\(a\))?):)$/mu, // W dniu DATE, NAME <EMAIL> pisze|napisał: (at most 2 lines)
+  nativeTrailingKeyword(`${HS}*`, "(W\\sdniu|Dnia)\\s", "(pisze|napisał(\\(a\\))?):", "mu"), // W dniu DATE, NAME <EMAIL> pisze|napisał: (at most 2 lines)
   nativeOpenKeywordName("Den", "skrev", 1, ".+"), // Den DATE skrev NAME <EMAIL>:
   nativeOpenKeyword("", "pe", "kirjoitti:", ""), // pe DATE NAME <EMAIL> kirjoitti:
   nativeOpenKeywordName("Am", "schrieb", 2, `(?:.+\\s?[\\[<]\\n.+[\\]>]|.+${LT}[\\[<].+[\\]>]|.+${LT}|.+)`), // Am DATE schrieb NAME <EMAIL>: OR Am DATE um TIME schrieb NAME <EMAIL>: (with optional newline after <)
-  new RegExp(`^${HS}*(ср\\,\\s(?:.+\\n\\u202fг\\. в\\s|.+\\u202fг\\. в${LT}|.(?:(?!\\u202fг\\. в${HS}).)*\\u202fг\\. в${HS})(?:.+,${LT}|.(?:(?!,${HS}).)*,${HS}).[^\\[|<\\n\\r\\u2028\\u2029]*[\\[|<].+[\\]|>]:)$`, "m"), // ср, DATE г. в TIME, NAME <EMAIL>:
-  /^(在[^\n]+(?:\n[^\n]*)?写道：)$/m, // > 在 DATE, TIME, NAME 写道： (at most 2 lines)
+  new RegExp(`^${HS}*(ср\\,\\s(?:.+\\n\\u202fг\\. в\\s|.+\\u202fг\\. в${LT}|.${upTo(`\\u202fг\\. в${HS}`)}\\u202fг\\. в${HS})(?:.+,${LT}|.${upTo(`,${HS}`)},${HS}).[^\\[|<\\n\\r\\u2028\\u2029]*[\\[|<].+[\\]|>]:)$`, "m"), // ср, DATE г. в TIME, NAME <EMAIL>:
+  nativeTrailingKeyword("", "在", "写道："), // > 在 DATE, TIME, NAME 写道： (at most 2 lines)
   /^(20[0-9]{2}\..+\s작성:)$/m, // DATE TIME NAME 작성:
   /^(20[0-9]{2}\/.+のメッセージ:)$/m, // DATE TIME、NAME のメッセージ:
-  new RegExp(`^((?:.+${LT}|.(?:(?!${HS}<).)*${HS})<.+>\\sschrieb:)$`, "m"), // NAME <EMAIL> schrieb:
-  /^(.(?:(?!\son).)*\son(?:(?!at).)*at.*wrote:|.+[\n\r\u2028\u2029]on(?:(?!at).)*at.*wrote:)$/m, // NAME on DATE wrote:
+  new RegExp(`^((?:.+${LT}|.${upTo(`${HS}<`)}${HS})<.+>\\sschrieb:)$`, "m"), // NAME <EMAIL> schrieb:
+  new RegExp(`^(.${upTo("\\son")}\\son${upTo("at")}at.*wrote:|.+${LT}on${upTo("at")}at.*wrote:)$`, "m"), // NAME on DATE wrote:
   nativeFieldHeader("From", "\\[|<", "\\]|>"), // "From: NAME <EMAIL>" OR "From : NAME <EMAIL>" OR "From : NAME<EMAIL>"(With support whitespace before start and before <)
   nativeFieldHeader("Von", "\\[|<", "\\]|>"), // "Von: NAME <EMAIL>" OR "Von : NAME <EMAIL>" OR "Von : NAME<EMAIL>"(With support whitespace before start and before <)
   nativeFieldHeader("De", "\\[<", "\\]>"), // "De: NAME <EMAIL>" OR "De : NAME <EMAIL>" OR "De : NAME<EMAIL>"  (With support whitespace before start and before <)
   nativeFieldHeader("Van", "\\[<", "\\]>"), // "Van: NAME <EMAIL>" OR "Van : NAME <EMAIL>" OR "Van : NAME<EMAIL>"  (With support whitespace before start and before <)
   nativeFieldHeader("Da", "\\[<", "\\]>"), // "Da: NAME <EMAIL>" OR "Da : NAME <EMAIL>" OR "Da : NAME<EMAIL>"  (With support whitespace before start and before <)
   /^(20[0-9]{2})-([0-9]{2}).([0-9]{2}).([0-9]{2}):([0-9]{2})\n?(.*)>:$/m, // 20YY-MM-DD HH:II GMT+01:00 NAME <EMAIL>:
-  nativeBoundedKeyword("[a-z]{3,4}\\.\\s", SKREV), // DATE skrev NAME <EMAIL>: (at most 3 lines)
-  /^([0-9]{2}).[0-9]{2}.20[0-9]{2}(?:(?![0-9]{2}.[0-9]{2}).)*[0-9]{2}.[0-9]{2}(?:(?!" *<).)*" *<.*> *:$/m, // DD.MM.20YY HH:II NAME <EMAIL>
-  /^[0-9]{2}:[0-9]{2}((?:(?![0-9]{4}).)*)[0-9]{4}(?:(?!" *<).)*" *<.*> *:$/, // HH:II, DATE, NAME <EMAIL>:
-  /^((?:(?![0-9]{4}).)*)[0-9]{4}(?:(?!from).)*from(?:(?!<).)*<.*>:$/, // DATE from NAME <EMAIL>:
-  /^-{1,12} ?(O|o)riginal (M|m)essage ?-{1,12}$/i,
-  /^-{1,12} ?(O|o)prindelig (B|b)esked ?-{1,12}$/i,
-  /^-{1,12} ?(M|m)essage d\'origine ?-{1,12}$/i,
-  /^-{1,12} ?(U|u)rsprüngliche (N|n)achricht ?-{0,12}$/i
+  nativeBoundedKeyword("[a-z]{3,4}\\.\\s", "skrev", true), // DATE skrev NAME <EMAIL>: (at most 3 lines)
+  new RegExp(`^([0-9]{2}).[0-9]{2}.20[0-9]{2}${upTo("[0-9]{2}.[0-9]{2}")}[0-9]{2}.[0-9]{2}${upTo("\" *<")}" *<.*> *:$`, "m"), // DD.MM.20YY HH:II NAME <EMAIL>
+  new RegExp(`^[0-9]{2}:[0-9]{2}(${upTo("[0-9]{4}")})[0-9]{4}${upTo("\" *<")}" *<.*> *:$`), // HH:II, DATE, NAME <EMAIL>:
+  new RegExp(`^(${upTo("[0-9]{4}")})[0-9]{4}${upTo("from")}from${upTo("<")}<.*>:$`), // DATE from NAME <EMAIL>:
+  separatorHeader("Original Message"), // -----Original Message-----
+  separatorHeader("Oprindelig Besked"), // -------- Oprindelig besked --------
+  separatorHeader("Message d'origine"), // -------- Message d'origine --------
+  separatorHeader("Ursprüngliche Nachricht") // -----Ursprüngliche Nachricht-----
 ];
 
 const SIGNATURE_PATTERNS: RegExp[] = [
