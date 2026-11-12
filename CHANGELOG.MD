@@ -1,6 +1,12 @@
 Changelog
 =========
 
+## v3.0.0
+
+- Drop re2: all regexes are now ReDoS-safe on native `RegExp`.
+- Add 340+ test cases from other reply parsers.
+- Detect more quote headers (Outlook, Gmail, Apple Mail) in more languages.
+
 ## v2.3.9
 
 - Pin re2 peer dependency to 1.x.
